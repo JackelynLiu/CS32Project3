@@ -15,6 +15,7 @@ GameWorld* createStudentWorld(string assetPath)
 StudentWorld::StudentWorld(string assetPath)
 : GameWorld(assetPath)
 {
+
 }
 
 int StudentWorld::init()
@@ -43,7 +44,7 @@ int StudentWorld::init()
 				case Level::dumb_zombie:
 					break;
 				case Level::player:
-					m_player = new Penelope(level_x*SPRITE_WIDTH, level_y*SPRITE_HEIGHT);
+					m_player = new Penelope(level_x*SPRITE_WIDTH, level_y*SPRITE_HEIGHT, this);
 					break;
 				case Level::exit:
 					break;
