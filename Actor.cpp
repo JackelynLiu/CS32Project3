@@ -30,7 +30,8 @@ void Penelope::doSomething()
 		{
 		case KEY_PRESS_LEFT:
 			setDirection(left);
-			moveTo(getX() - 4, getY());
+			//if (!studw->containsWall(getX(), getY()))
+				moveTo(getX() - 4, getY());
 			break;
 		case KEY_PRESS_RIGHT:
 			setDirection(right);
