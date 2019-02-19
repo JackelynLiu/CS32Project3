@@ -49,7 +49,7 @@ int StudentWorld::init()
 				case Level::exit:
 					break;
 				case Level::wall:
-					gameObjects.push_back(new Wall(level_x*SPRITE_WIDTH, level_y*SPRITE_HEIGHT));
+					wallObjects.push_back(new Wall(level_x*SPRITE_WIDTH, level_y*SPRITE_HEIGHT));
 					break;
 				case Level::pit:
 					break;
@@ -73,4 +73,17 @@ int StudentWorld::move()
 void StudentWorld::cleanUp()
 {
 	delete m_player;
+}
+
+bool StudentWorld::containsWall(double x, double y)
+{
+	vector<Actor*>::iterator it;
+	it = wallObjects.begin();
+	while (it != wallObjects.end())
+	{
+		if ((*it)->getX() == x && (*it)->getY() == y)
+			break;
+	}
+	if (it == wallObjects.end()) return false;
+	else return true;
 }
