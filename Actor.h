@@ -2,6 +2,7 @@
 #define ACTOR_H_
 
 #include "GraphObject.h"
+class StudentWorld;
 
 class Actor : public GraphObject
 {
@@ -11,17 +12,18 @@ public:
 	virtual void doSomething() = 0;
 
 private:
-	//bool m_status;
+	
 };
 
 class Penelope : public Actor
 {
 public:
-	Penelope(double x, double y);
+	Penelope(double x, double y, StudentWorld* sw);
 	virtual ~Penelope();
 	virtual void doSomething();
 
 private:
+	StudentWorld* studw;
 };
 
 class Wall :public Actor
