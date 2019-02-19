@@ -16,9 +16,10 @@ public:
     virtual int init();
     virtual int move();
     virtual void cleanUp();
+	bool containsWall(double x, double y);
 
 private:
-	std::vector<Actor*> gameObjects;
+	std::vector<Actor*> wallObjects;
 	Penelope* m_player;
 };
 
