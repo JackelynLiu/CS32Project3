@@ -31,22 +31,22 @@ void Penelope::doSomething()
 		{
 		case KEY_PRESS_LEFT:
 			setDirection(left);
-			if (!(studw->containsWall(current_x - 4, current_y)))
+			if (!(studw->containsObstacle(current_x - 4, current_y)))
 				moveTo(current_x - 4, current_y);
 			break;
 		case KEY_PRESS_RIGHT:
 			setDirection(right);
-			if (!(studw->containsWall(current_x + 4, current_y)))
+			if (!(studw->containsObstacle(current_x + 4, current_y)))
 				moveTo(current_x + 4, current_y);
 			break;
 		case KEY_PRESS_DOWN:
 			setDirection(down);
-			if (!(studw->containsWall(current_x, current_y - 4)))
+			if (!(studw->containsObstacle(current_x, current_y - 4)))
 				moveTo(current_x, current_y - 4);
 			break;
 		case KEY_PRESS_UP:
 			setDirection(up);
-			if (!(studw->containsWall(current_x, current_y + 4)))
+			if (!(studw->containsObstacle(current_x, current_y + 4)))
 				moveTo(current_x, current_y + 4);
 			break;
 		/*case KEY_PRESS_SPACE:
