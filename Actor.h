@@ -10,6 +10,7 @@ public:
 	Actor(int imageID, double x, double y, int dir, int depth);
 	//virtual ~Actor();
 	virtual void doSomething() = 0;
+	//virtual void blocksMovement() = 0;
 
 private:
 	
