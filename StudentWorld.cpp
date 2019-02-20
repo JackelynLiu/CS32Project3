@@ -51,7 +51,7 @@ int StudentWorld::init()
 				case Level::exit:
 					break;
 				case Level::wall:
-					wallObjects.push_back(new Wall(level_x*SPRITE_WIDTH, level_y*SPRITE_HEIGHT));
+					gameObjects.push_back(new Wall(level_x*SPRITE_WIDTH, level_y*SPRITE_HEIGHT));
 					break;
 				case Level::pit:
 					break;
@@ -82,12 +82,12 @@ void StudentWorld::cleanUp()
 	cout << "Completed clean up." << endl;
 }
 
-bool StudentWorld::containsWall(double x, double y)
+bool StudentWorld::containsObstacle(double x, double y)
 {
 	vector<Actor*>::iterator it;
-	it = wallObjects.begin();
+	it = gameObjects.begin();
 
-	while (it != wallObjects.end())
+	while (it != gameObjects.end())
 	{
 		double lower_x = (*it)->getX();
 		double lower_y = (*it)->getY();
