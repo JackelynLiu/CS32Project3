@@ -18,6 +18,8 @@ StudentWorld::StudentWorld(string assetPath)
 
 }
 
+//StudentWorld::~StudentWorld() { cleanUp(); }
+
 int StudentWorld::init()
 {
 	Level lev(assetPath());
@@ -73,17 +75,30 @@ int StudentWorld::move()
 void StudentWorld::cleanUp()
 {
 	delete m_player;
+	/*for (int i = 0; i < wallObjects.size(); i++)
+	{
+		delete wallObjects[i];
+	}*/
+	cout << "Completed clean up." << endl;
 }
 
 bool StudentWorld::containsWall(double x, double y)
 {
 	vector<Actor*>::iterator it;
 	it = wallObjects.begin();
+
 	while (it != wallObjects.end())
 	{
-		if ((*it)->getX() == x && (*it)->getY() == y)
-			break;
+		double lower_x = (*it)->getX();
+		double lower_y = (*it)->getY();
+		double upper_x = lower_x + SPRITE_WIDTH - 1;
+		double upper_y = lower_y + SPRITE_HEIGHT - 1;
+		if (lower_x <= x && x <= upper_x && lower_y <= y && y <= upper_y)
+			return true;
+		if (lower_x <= x + SPRITE_WIDTH - 1 && x + SPRITE_WIDTH - 1 <= upper_x &&
+			lower_y <= y + SPRITE_HEIGHT - 1 && y + SPRITE_HEIGHT - 1 <= upper_y)
+			return true;
+		it++;
 	}
-	if (it == wallObjects.end()) return false;
-	else return true;
+	return false;
 }
