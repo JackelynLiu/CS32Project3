@@ -17,10 +17,10 @@ public:
     virtual int init();
     virtual int move();
     virtual void cleanUp();
-	bool containsWall(double x, double y);
+	bool containsObstacle(double x, double y);
 
 private:
-	std::vector<Actor*> wallObjects;
+	std::vector<Actor*> gameObjects;
 	Penelope* m_player;
 };
 
