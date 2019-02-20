@@ -20,7 +20,7 @@ class Penelope : public Actor
 {
 public:
 	Penelope(double x, double y, StudentWorld* sw);
-	virtual ~Penelope();
+	//virtual ~Penelope();
 	virtual void doSomething();
 
 private:
