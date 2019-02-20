@@ -24,6 +24,7 @@ public:
 
 private:
 	StudentWorld* studw;
+	
 };
 
 class Wall :public Actor
