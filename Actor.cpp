@@ -9,9 +9,8 @@ Actor::Actor(int imageID, double x, double y, int dir, int depth)
 }
 
 Penelope::Penelope(double x, double y, StudentWorld* sw)
-	: Actor(IID_PLAYER, x, y, right, 0)
+	:Actor(IID_PLAYER, x, y, right, 0), studw(sw)
 {
-	studw = sw;
 }
 
 Penelope::~Penelope()
@@ -26,24 +25,29 @@ void Penelope::doSomething()
 	int ch;
 	if (studw->getKey(ch))
 	{
+		double current_x = getX();
+		double current_y = getY();
 		switch (ch)
 		{
 		case KEY_PRESS_LEFT:
 			setDirection(left);
-			//if (!studw->containsWall(getX(), getY()))
-				moveTo(getX() - 4, getY());
+			if (!(studw->containsWall(current_x - 4, current_y)))
+				moveTo(current_x - 4, current_y);
 			break;
 		case KEY_PRESS_RIGHT:
 			setDirection(right);
-			moveTo(getX() + 4, getY());
+			if (!(studw->containsWall(current_x + 4, current_y)))
+				moveTo(current_x + 4, current_y);
 			break;
 		case KEY_PRESS_DOWN:
 			setDirection(down);
-			moveTo(getX(), getY() - 4);
+			if (!(studw->containsWall(current_x, current_y - 4)))
+				moveTo(current_x, current_y - 4);
 			break;
 		case KEY_PRESS_UP:
 			setDirection(up);
-			moveTo(getX(), getY() + 4);
+			if (!(studw->containsWall(current_x, current_y + 4)))
+				moveTo(current_x, current_y + 4);
 			break;
 		/*case KEY_PRESS_SPACE:
 			break*/
