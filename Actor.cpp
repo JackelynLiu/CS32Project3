@@ -13,10 +13,10 @@ Penelope::Penelope(double x, double y, StudentWorld* sw)
 {
 }
 
-Penelope::~Penelope()
-{
-	delete this;
-}
+//Penelope::~Penelope()
+//{
+//	delete this;
+//}
 
 void Penelope::doSomething()
 {
