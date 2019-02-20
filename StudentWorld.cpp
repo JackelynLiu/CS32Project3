@@ -18,7 +18,7 @@ StudentWorld::StudentWorld(string assetPath)
 
 }
 
-//StudentWorld::~StudentWorld() { cleanUp(); }
+StudentWorld::~StudentWorld() { cleanUp(); }
 
 int StudentWorld::init()
 {
@@ -75,10 +75,15 @@ int StudentWorld::move()
 void StudentWorld::cleanUp()
 {
 	delete m_player;
-	/*for (int i = 0; i < wallObjects.size(); i++)
+	m_player = nullptr;
+	cout << "deleted player" << endl;
+	vector<Actor*>::iterator it;
+	for (it = gameObjects.begin(); it != gameObjects.end(); )
 	{
-		delete wallObjects[i];
-	}*/
+		delete (*it);
+		it = gameObjects.erase(it);
+	}
+	cout << "vector size: " << gameObjects.size() << endl;
 	cout << "Completed clean up." << endl;
 }
 
