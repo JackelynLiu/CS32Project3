@@ -49,6 +49,7 @@ int StudentWorld::init()
 					m_player = new Penelope(level_x*SPRITE_WIDTH, level_y*SPRITE_HEIGHT, this);
 					break;
 				case Level::exit:
+					gameObjects.push_back(new Exit(level_x*SPRITE_WIDTH, level_y*SPRITE_HEIGHT));
 					break;
 				case Level::wall:
 					gameObjects.push_back(new Wall(level_x*SPRITE_WIDTH, level_y*SPRITE_HEIGHT));
@@ -94,16 +95,24 @@ bool StudentWorld::containsObstacle(double x, double y)
 
 	while (it != gameObjects.end())
 	{
-		double lower_x = (*it)->getX();
-		double lower_y = (*it)->getY();
-		double upper_x = lower_x + SPRITE_WIDTH - 1;
-		double upper_y = lower_y + SPRITE_HEIGHT - 1;
-		if (lower_x <= x && x <= upper_x && lower_y <= y && y <= upper_y)
-			return true;
-		if (lower_x <= x + SPRITE_WIDTH - 1 && x + SPRITE_WIDTH - 1 <= upper_x &&
-			lower_y <= y + SPRITE_HEIGHT - 1 && y + SPRITE_HEIGHT - 1 <= upper_y)
-			return true;
+		if ((*it)->blocksMovement())
+		{
+			double lower_x = (*it)->getX();
+			double lower_y = (*it)->getY();
+			double upper_x = lower_x + SPRITE_WIDTH - 1;
+			double upper_y = lower_y + SPRITE_HEIGHT - 1;
+			if (lower_x <= x && x <= upper_x && lower_y <= y && y <= upper_y)
+				return true;
+			if (lower_x <= x + SPRITE_WIDTH - 1 && x + SPRITE_WIDTH - 1 <= upper_x &&
+				lower_y <= y + SPRITE_HEIGHT - 1 && y + SPRITE_HEIGHT - 1 <= upper_y)
+				return true;
+		}
 		it++;
 	}
 	return false;
+}
+
+bool StudentWorld::determineOverlap(double x, double y)
+{
+
 }
