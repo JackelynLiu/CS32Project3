@@ -18,6 +18,7 @@ public:
     virtual int move();
     virtual void cleanUp();
 	bool containsObstacle(double x, double y);
+	bool determineOverlap(double x, double y);
 
 private:
 	std::vector<Actor*> gameObjects;
