@@ -57,6 +57,7 @@ void Penelope::doSomething()
 	}
 }
 
+bool Penelope::blocksMovement() { return true; }
 
 Wall::Wall(double x, double y)
 	:Actor(IID_WALL,x, y, right, 0)
@@ -64,7 +65,15 @@ Wall::Wall(double x, double y)
 
 }
 
-Wall::~Wall() {}
+//Wall::~Wall() {}
 
 void Wall::doSomething() {}
 
+bool Wall::blocksMovement() { return true; }
+
+Exit::Exit(double x, double y)
+	:Actor(IID_EXIT, x, y, right, 0)
+{}
+
+void Exit::doSomething() {}
+bool Exit::blocksMovement() { return false; }
