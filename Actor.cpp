@@ -7,6 +7,10 @@ Actor::Actor(int imageID, double x, double y, int dir, int depth)
 	:GraphObject(imageID, x, y, dir, depth), m_status(true)
 {}
 
+bool Actor::getStatus() const { return m_status; }
+
+void Actor::setStatus(bool new_status) { m_status = new_status; }
+
 Person::Person(int imageID, double x, double y)
 	:Actor(imageID, x, y, right, 0), m_infectedstatus(false), m_infectioncount(0)
 {}
@@ -61,6 +65,30 @@ Citizen::Citizen(double x, double y)
 {}
 
 void Citizen::doSomething()
+{
+	if (!getStatus())
+		return;
+
+}
+
+Zombie::Zombie(double x, double y)
+	:Actor(IID_ZOMBIE, x, y, right, 0)
+{}
+
+bool Zombie::blocksMovement() { return true; }
+
+SmartZombie::SmartZombie(double x, double y)
+	:Zombie(x, y)
+{}
+
+void SmartZombie::doSomething()
+{}
+
+DumbZombie::DumbZombie(double x, double y)
+	:Zombie(x, y)
+{}
+
+void DumbZombie::doSomething()
 {}
 
 Wall::Wall(double x, double y)
@@ -72,7 +100,7 @@ void Wall::doSomething() {}
 bool Wall::blocksMovement() { return true; }
 
 Exit::Exit(double x, double y)
-	:Actor(IID_EXIT, x, y, right, 0)
+	:Actor(IID_EXIT, x, y, right, 1)
 {}
 
 void Exit::doSomething() {}
