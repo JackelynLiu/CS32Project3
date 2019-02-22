@@ -13,27 +13,42 @@ public:
 	virtual bool blocksMovement() = 0;
 
 private:
-	
+	bool m_status;
 };
 
-class Penelope : public Actor
+class Person :public Actor
 {
 public:
-	Penelope(double x, double y, StudentWorld* sw);
-	//virtual ~Penelope();
-	virtual void doSomething();
+	Person(int imageID, double x, double y);
+	virtual void doSomething() = 0;
 	virtual bool blocksMovement();
 
 private:
+	bool m_infectedstatus;
+	int m_infectioncount;
+};
+
+class Citizen : public Person
+{
+	Citizen(double x, double y);
+	virtual void doSomething();
+	//virtual bool blocksMovement();
+};
+
+class Penelope : public Person
+{
+public:
+	Penelope(double x, double y, StudentWorld* sw);
+	virtual void doSomething();
+
+private:
 	StudentWorld* studw;
-	
 };
 
 class Wall :public Actor
 {
 public:
 	Wall(double x, double y);
-	//virtual ~Wall();
 	virtual void doSomething();
 	virtual bool blocksMovement();
 };
