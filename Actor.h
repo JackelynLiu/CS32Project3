@@ -4,7 +4,7 @@
 #include "GraphObject.h"
 class StudentWorld;
 
-class Actor : public GraphObject
+class Actor :public GraphObject
 {
 public:
 	Actor(int imageID, double x, double y, int dir, int depth);
@@ -18,7 +18,7 @@ private:
 	bool m_status;
 };
 
-class Person : public Actor
+class Person :public Actor
 {
 public:
 	Person(int imageID, double x, double y);
@@ -32,6 +32,7 @@ private:
 
 class Citizen : public Person
 {
+public:
 	Citizen(double x, double y);
 	virtual void doSomething();
 };
@@ -66,6 +67,14 @@ class DumbZombie : public Zombie
 public:
 	DumbZombie(double x, double y);
 	virtual void doSomething();
+};
+
+class StillObjects :public Actor
+{
+public:
+	StillObjects(int imageID, double x, double y, int dir, int depth);
+	virtual void doSomething() = 0;
+	virtual bool blocksMovement() = 0;
 };
 
 class Wall :public Actor
