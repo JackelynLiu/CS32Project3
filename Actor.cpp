@@ -99,7 +99,7 @@ StillObjects::StillObjects(StudentWorld* sw, int imageID, double x, double y, in
 	:Actor(sw, imageID, x, y, dir, depth)
 {}
 
-bool StillObjects::blocksMovement() { return true; }
+bool StillObjects::blocksMovement() { return false; }
 
 Wall::Wall(StudentWorld* sw, double x, double y)
 	:StillObjects(sw, IID_WALL,x, y, right, 0)
@@ -115,3 +115,56 @@ Exit::Exit(StudentWorld* sw, double x, double y)
 
 void Exit::doSomething()
 {}
+
+Pit::Pit(StudentWorld* sw, double x, double y)
+	:StillObjects(sw, IID_PIT, x, y, right, 0)
+{}
+
+void Pit::doSomething() {}
+
+Goodie::Goodie(StudentWorld* sw, int imageID, double x, double y)
+	:StillObjects(sw, imageID, x, y, right, 1)
+{}
+
+VaccineGoodie::VaccineGoodie(StudentWorld* sw, double x, double y)
+	: Goodie(sw, IID_VACCINE_GOODIE, x, y)
+{}
+
+void VaccineGoodie::doSomething() {}
+
+GasCanGoodie::GasCanGoodie(StudentWorld* sw, double x, double y)
+	:Goodie(sw, IID_GAS_CAN_GOODIE, x, y)
+{}
+
+void GasCanGoodie::doSomething() {}
+
+LandMineGoodie::LandMineGoodie(StudentWorld* sw, double x, double y)
+	: Goodie(sw, IID_LANDMINE_GOODIE, x, y)
+{}
+
+void LandMineGoodie::doSomething() {}
+
+LandMine::LandMine(StudentWorld* sw, double x, double y)
+	: Goodie(sw, IID_LANDMINE, x, y)
+{}
+
+void LandMine::doSomething() {}
+
+Projectile::Projectile(StudentWorld* sw, int imageID, double x, double y, int dir)
+	:StillObjects(sw, imageID, x, y, dir, 0)
+{}
+
+Flame::Flame(StudentWorld* sw, double x, double y, int dir)
+	: Projectile(sw, IID_FLAME, x, y, dir)
+{}
+
+void Flame::doSomething() {}
+
+Vomit::Vomit(StudentWorld* sw, double x, double y, int dir)
+	: Projectile(sw, IID_VOMIT, x, y, dir)
+{
+	getWorld()->playSound(SOUND_ZOMBIE_VOMIT);
+}
+
+void Vomit::doSomething() {}
+
