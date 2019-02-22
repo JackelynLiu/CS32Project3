@@ -7,23 +7,32 @@ class StudentWorld;
 class Actor :public GraphObject
 {
 public:
-	Actor(int imageID, double x, double y, int dir, int depth);
+	Actor(StudentWorld* sw, int imageID, double x, double y, int dir, int depth);
 	//virtual ~Actor();
 	virtual void doSomething() = 0;
 	virtual bool blocksMovement() = 0;
 	bool getStatus() const;
 	void setStatus(bool new_status);
+	StudentWorld* getWorld() { return current_world; }
 
 private:
+	StudentWorld* current_world;
 	bool m_status;
 };
 
-class Person :public Actor
+class MovingObjects :public Actor
 {
 public:
-	Person(int imageID, double x, double y);
+	MovingObjects(StudentWorld* sw, int imageID, double x, double y);
 	virtual void doSomething() = 0;
 	virtual bool blocksMovement();
+};
+
+class Person :public MovingObjects
+{
+public:
+	Person(StudentWorld* sw, int imageID, double x, double y);
+	virtual void doSomething() = 0;
 
 private:
 	bool m_infectedstatus;
@@ -33,24 +42,23 @@ private:
 class Citizen : public Person
 {
 public:
-	Citizen(double x, double y);
+	Citizen(StudentWorld* sw, double x, double y);
 	virtual void doSomething();
 };
 
 class Penelope : public Person
 {
 public:
-	Penelope(double x, double y, StudentWorld* sw);
+	Penelope(StudentWorld* sw, double x, double y);
 	virtual void doSomething();
-
 private:
-	StudentWorld* studw;
+
 };
 
 class Zombie :public Actor
 {
 public:
-	Zombie(double x, double y);
+	Zombie(StudentWorld* sw, double x, double y);
 	virtual void doSomething() = 0;
 	virtual bool blocksMovement();
 };
@@ -58,39 +66,38 @@ public:
 class SmartZombie :public Zombie
 {
 public:
-	SmartZombie(double x, double y);
+	SmartZombie(StudentWorld* sw, double x, double y);
 	virtual void doSomething();
 };
 
 class DumbZombie : public Zombie
 {
 public:
-	DumbZombie(double x, double y);
+	DumbZombie(StudentWorld* sw, double x, double y);
 	virtual void doSomething();
 };
 
 class StillObjects :public Actor
 {
 public:
-	StillObjects(int imageID, double x, double y, int dir, int depth);
+	StillObjects(StudentWorld* sw, int imageID, double x, double y, int dir, int depth);
 	virtual void doSomething() = 0;
-	virtual bool blocksMovement() = 0;
+	virtual bool blocksMovement();
 };
 
-class Wall :public Actor
+class Wall :public StillObjects
 {
 public:
-	Wall(double x, double y);
+	Wall(StudentWorld* sw, double x, double y);
 	virtual void doSomething();
 	virtual bool blocksMovement();
 };
 
-class Exit :public Actor
+class Exit :public StillObjects
 {
 public:
-	Exit(double x, double y);
+	Exit(StudentWorld* sw, double x, double y);
 	virtual void doSomething();
-	virtual bool blocksMovement();
 };
 
 //Students:  Add code to this file, Actor.cpp, StudentWorld.h, and StudentWorld.cpp
