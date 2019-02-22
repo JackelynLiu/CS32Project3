@@ -23,10 +23,10 @@ StudentWorld::~StudentWorld() { cleanUp(); }
 int StudentWorld::init()
 {
 	Level lev(assetPath());
-	string levelFile = "level01.txt";
+	string levelFile = "level03.txt";
 	Level::LoadResult result = lev.loadLevel(levelFile);
 	if (result == Level::load_fail_file_not_found)
-		cerr << "Cannot find level01.txt data file" << endl;
+		cerr << "Cannot find level03.txt data file" << endl;
 	else if (result == Level::load_fail_bad_format)
 		cerr << "Your level was improperly formatted" << endl;
 	else if (result == Level::load_success)
@@ -42,11 +42,17 @@ int StudentWorld::init()
 				case Level::empty:
 					break;
 				case Level::smart_zombie:
+					gameObjects.push_back(new SmartZombie(level_x*SPRITE_WIDTH, level_y*SPRITE_HEIGHT));
 					break;
 				case Level::dumb_zombie:
+					gameObjects.push_back(new DumbZombie(level_x*SPRITE_WIDTH, level_y*SPRITE_HEIGHT));
 					break;
 				case Level::player:
 					m_player = new Penelope(level_x*SPRITE_WIDTH, level_y*SPRITE_HEIGHT, this);
+					break;
+				case Level::citizen:
+					//gameObjects.push_back(new Citizen(level_x*SPRITE_WIDTH, level_y*SPRITE_HEIGHT));
+					num_alivecitizens++;
 					break;
 				case Level::exit:
 					gameObjects.push_back(new Exit(level_x*SPRITE_WIDTH, level_y*SPRITE_HEIGHT));
@@ -60,6 +66,7 @@ int StudentWorld::init()
 				}
 			}
 		}
+		setGameStatText("Score: 0   Level: 1   Lives: 3   Vacc: 0   Flames: 0   Mines: 0   Infected: 0");
 	}
     return GWSTATUS_CONTINUE_GAME;
 }
@@ -101,7 +108,14 @@ bool StudentWorld::containsObstacle(double x, double y)
 			double lower_y = (*it)->getY();
 			double right_x = left_x + SPRITE_WIDTH - 1;
 			double upper_y = lower_y + SPRITE_HEIGHT - 1;
-			if (left_x <= x && x <= right_x && lower_y <= y && y <= upper_y)
+			if (left_x <= x && x <= right_x &&
+				lower_y <= y && y <= upper_y)
+				return true;
+			if (left_x <= x && x <= right_x &&
+				lower_y <= y + SPRITE_HEIGHT - 1 && y + SPRITE_HEIGHT - 1 <= upper_y)
+				return true;
+			if (left_x <= x + SPRITE_WIDTH - 1 && x + SPRITE_WIDTH - 1 <= right_x &&
+				lower_y <= y && y <= upper_y)
 				return true;
 			if (left_x <= x + SPRITE_WIDTH - 1 && x + SPRITE_WIDTH - 1 <= right_x &&
 				lower_y <= y + SPRITE_HEIGHT - 1 && y + SPRITE_HEIGHT - 1 <= upper_y)
