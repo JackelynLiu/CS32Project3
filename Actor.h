@@ -100,6 +100,68 @@ public:
 	virtual void doSomething();
 };
 
+class Pit :public StillObjects
+{
+public:
+	Pit(StudentWorld* sw, double x, double y);
+	virtual void doSomething();
+};
+
+class Goodie :public StillObjects
+{
+public:
+	Goodie(StudentWorld* sw, int imageID, double x, double y);
+	virtual void doSomething() = 0;
+};
+
+class VaccineGoodie :public Goodie
+{
+public:
+	VaccineGoodie(StudentWorld* sw, double x, double y);
+	virtual void doSomething();
+};
+
+class GasCanGoodie :public Goodie
+{
+public:
+	GasCanGoodie(StudentWorld* sw, double x, double y);
+	virtual void doSomething();
+};
+
+class LandMineGoodie :public Goodie
+{
+public:
+	LandMineGoodie(StudentWorld* sw, double x, double y);
+	virtual void doSomething();
+};
+
+class LandMine :public Goodie
+{
+public:
+	LandMine(StudentWorld* sw, double x, double y);
+	virtual void doSomething();
+};
+
+class Projectile :public StillObjects
+{
+public:
+	Projectile(StudentWorld* sw, int imageID, double x, double y, int dir);
+	virtual void doSomething() = 0;
+};
+
+class Flame :public Projectile
+{
+public:
+	Flame(StudentWorld* sw, double x, double y, int dir);
+	virtual void doSomething();
+};
+
+class Vomit :public Projectile
+{
+public:
+	Vomit(StudentWorld* sw, double x, double y, int dir);
+	virtual void doSomething();
+};
 //Students:  Add code to this file, Actor.cpp, StudentWorld.h, and StudentWorld.cpp
 
 #endif // ACTOR_H_
