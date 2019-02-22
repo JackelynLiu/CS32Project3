@@ -91,6 +91,12 @@ DumbZombie::DumbZombie(double x, double y)
 void DumbZombie::doSomething()
 {}
 
+StillObjects::StillObjects(int imageID, double x, double y, int dir, int depth)
+	:Actor(imageID, x, y, dir, depth)
+{
+
+}
+
 Wall::Wall(double x, double y)
 	:Actor(IID_WALL,x, y, right, 0)
 {}
@@ -103,5 +109,7 @@ Exit::Exit(double x, double y)
 	:Actor(IID_EXIT, x, y, right, 1)
 {}
 
-void Exit::doSomething() {}
+void Exit::doSomething()
+{}
+
 bool Exit::blocksMovement() { return false; }
