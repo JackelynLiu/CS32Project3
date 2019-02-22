@@ -23,6 +23,7 @@ public:
 private:
 	std::vector<Actor*> gameObjects;
 	Penelope* m_player;
+	int num_alivecitizens;
 };
 
 #endif // STUDENTWORLD_H_
