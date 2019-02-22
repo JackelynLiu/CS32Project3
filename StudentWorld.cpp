@@ -42,23 +42,23 @@ int StudentWorld::init()
 				case Level::empty:
 					break;
 				case Level::smart_zombie:
-					gameObjects.push_back(new SmartZombie(level_x*SPRITE_WIDTH, level_y*SPRITE_HEIGHT));
+					gameObjects.push_back(new SmartZombie(this, level_x*SPRITE_WIDTH, level_y*SPRITE_HEIGHT));
 					break;
 				case Level::dumb_zombie:
-					gameObjects.push_back(new DumbZombie(level_x*SPRITE_WIDTH, level_y*SPRITE_HEIGHT));
+					gameObjects.push_back(new DumbZombie(this, level_x*SPRITE_WIDTH, level_y*SPRITE_HEIGHT));
 					break;
 				case Level::player:
-					m_player = new Penelope(level_x*SPRITE_WIDTH, level_y*SPRITE_HEIGHT, this);
+					m_player = new Penelope(this, level_x*SPRITE_WIDTH, level_y*SPRITE_HEIGHT);
 					break;
 				case Level::citizen:
-					gameObjects.push_back(new Citizen(level_x*SPRITE_WIDTH, level_y*SPRITE_HEIGHT));
+					gameObjects.push_back(new Citizen(this, level_x*SPRITE_WIDTH, level_y*SPRITE_HEIGHT));
 					num_alivecitizens++;
 					break;
 				case Level::exit:
-					gameObjects.push_back(new Exit(level_x*SPRITE_WIDTH, level_y*SPRITE_HEIGHT));
+					gameObjects.push_back(new Exit(this, level_x*SPRITE_WIDTH, level_y*SPRITE_HEIGHT));
 					break;
 				case Level::wall:
-					gameObjects.push_back(new Wall(level_x*SPRITE_WIDTH, level_y*SPRITE_HEIGHT));
+					gameObjects.push_back(new Wall(this, level_x*SPRITE_WIDTH, level_y*SPRITE_HEIGHT));
 					break;
 				case Level::pit:
 					break;
