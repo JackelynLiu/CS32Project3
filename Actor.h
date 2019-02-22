@@ -11,12 +11,14 @@ public:
 	//virtual ~Actor();
 	virtual void doSomething() = 0;
 	virtual bool blocksMovement() = 0;
+	bool getStatus() const;
+	void setStatus(bool new_status);
 
 private:
 	bool m_status;
 };
 
-class Person :public Actor
+class Person : public Actor
 {
 public:
 	Person(int imageID, double x, double y);
@@ -32,7 +34,6 @@ class Citizen : public Person
 {
 	Citizen(double x, double y);
 	virtual void doSomething();
-	//virtual bool blocksMovement();
 };
 
 class Penelope : public Person
@@ -43,6 +44,28 @@ public:
 
 private:
 	StudentWorld* studw;
+};
+
+class Zombie :public Actor
+{
+public:
+	Zombie(double x, double y);
+	virtual void doSomething() = 0;
+	virtual bool blocksMovement();
+};
+
+class SmartZombie :public Zombie
+{
+public:
+	SmartZombie(double x, double y);
+	virtual void doSomething();
+};
+
+class DumbZombie : public Zombie
+{
+public:
+	DumbZombie(double x, double y);
+	virtual void doSomething();
 };
 
 class Wall :public Actor
