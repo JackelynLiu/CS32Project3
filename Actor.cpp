@@ -4,19 +4,18 @@
 #include "StudentWorld.h"
 
 Actor::Actor(int imageID, double x, double y, int dir, int depth)
-	:GraphObject(imageID, x, y, dir, depth)
-{
-}
+	:GraphObject(imageID, x, y, dir, depth), m_status(true)
+{}
+
+Person::Person(int imageID, double x, double y)
+	:Actor(imageID, x, y, right, 0), m_infectedstatus(false), m_infectioncount(0)
+{}
+
+bool Person::blocksMovement() { return true; }
 
 Penelope::Penelope(double x, double y, StudentWorld* sw)
-	:Actor(IID_PLAYER, x, y, right, 0), studw(sw)
-{
-}
-
-//Penelope::~Penelope()
-//{
-//	delete this;
-//}
+	:Person(IID_PLAYER, x, y), studw(sw)
+{}
 
 void Penelope::doSomething()
 {
@@ -57,15 +56,16 @@ void Penelope::doSomething()
 	}
 }
 
-bool Penelope::blocksMovement() { return true; }
+Citizen::Citizen(double x, double y)
+	:Person(IID_CITIZEN, x, y)
+{}
+
+void Citizen::doSomething()
+{}
 
 Wall::Wall(double x, double y)
 	:Actor(IID_WALL,x, y, right, 0)
-{
-
-}
-
-//Wall::~Wall() {}
+{}
 
 void Wall::doSomething() {}
 
