@@ -51,7 +51,7 @@ int StudentWorld::init()
 					m_player = new Penelope(level_x*SPRITE_WIDTH, level_y*SPRITE_HEIGHT, this);
 					break;
 				case Level::citizen:
-					//gameObjects.push_back(new Citizen(level_x*SPRITE_WIDTH, level_y*SPRITE_HEIGHT));
+					gameObjects.push_back(new Citizen(level_x*SPRITE_WIDTH, level_y*SPRITE_HEIGHT));
 					num_alivecitizens++;
 					break;
 				case Level::exit:
@@ -128,5 +128,6 @@ bool StudentWorld::containsObstacle(double x, double y)
 
 bool StudentWorld::determineOverlap(double x, double y)
 {
+
 	return false;
 }
