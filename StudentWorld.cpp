@@ -97,13 +97,13 @@ bool StudentWorld::containsObstacle(double x, double y)
 	{
 		if ((*it)->blocksMovement())
 		{
-			double lower_x = (*it)->getX();
+			double left_x = (*it)->getX();
 			double lower_y = (*it)->getY();
-			double upper_x = lower_x + SPRITE_WIDTH - 1;
+			double right_x = left_x + SPRITE_WIDTH - 1;
 			double upper_y = lower_y + SPRITE_HEIGHT - 1;
-			if (lower_x <= x && x <= upper_x && lower_y <= y && y <= upper_y)
+			if (left_x <= x && x <= right_x && lower_y <= y && y <= upper_y)
 				return true;
-			if (lower_x <= x + SPRITE_WIDTH - 1 && x + SPRITE_WIDTH - 1 <= upper_x &&
+			if (left_x <= x + SPRITE_WIDTH - 1 && x + SPRITE_WIDTH - 1 <= right_x &&
 				lower_y <= y + SPRITE_HEIGHT - 1 && y + SPRITE_HEIGHT - 1 <= upper_y)
 				return true;
 		}
@@ -114,5 +114,5 @@ bool StudentWorld::containsObstacle(double x, double y)
 
 bool StudentWorld::determineOverlap(double x, double y)
 {
-
+	return false;
 }
