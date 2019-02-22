@@ -36,33 +36,44 @@ int StudentWorld::init()
 		{
 			for (int level_y = 0; level_y < LEVEL_HEIGHT; level_y++)
 			{
+				int coord_x = level_x * SPRITE_WIDTH;
+				int coord_y = level_y * SPRITE_HEIGHT;
 				Level::MazeEntry ge = lev.getContentsOf(level_x, level_y); // level_x=5, level_y=10
 				switch (ge) // so x=80 and y=160
 				{
 				case Level::empty:
 					break;
 				case Level::smart_zombie:
-					gameObjects.push_back(new SmartZombie(this, level_x*SPRITE_WIDTH, level_y*SPRITE_HEIGHT));
+					gameObjects.push_back(new SmartZombie(this, coord_x, coord_y));
 					break;
 				case Level::dumb_zombie:
-					gameObjects.push_back(new DumbZombie(this, level_x*SPRITE_WIDTH, level_y*SPRITE_HEIGHT));
+					gameObjects.push_back(new DumbZombie(this, coord_x, coord_y));
 					break;
 				case Level::player:
-					m_player = new Penelope(this, level_x*SPRITE_WIDTH, level_y*SPRITE_HEIGHT);
+					m_player = new Penelope(this, coord_x, coord_y);
 					break;
 				case Level::citizen:
-					gameObjects.push_back(new Citizen(this, level_x*SPRITE_WIDTH, level_y*SPRITE_HEIGHT));
+					gameObjects.push_back(new Citizen(this, coord_x, coord_y));
 					num_alivecitizens++;
 					break;
 				case Level::exit:
-					gameObjects.push_back(new Exit(this, level_x*SPRITE_WIDTH, level_y*SPRITE_HEIGHT));
+					gameObjects.push_back(new Exit(this, coord_x, coord_y));
 					break;
 				case Level::wall:
-					gameObjects.push_back(new Wall(this, level_x*SPRITE_WIDTH, level_y*SPRITE_HEIGHT));
+					gameObjects.push_back(new Wall(this, coord_x, coord_y));
 					break;
 				case Level::pit:
+					gameObjects.push_back(new Pit(this, coord_x, coord_y));
 					break;
-					// etc…
+				case Level::gas_can_goodie:
+					gameObjects.push_back(new GasCanGoodie(this, coord_x, coord_y));
+					break;
+				case Level::landmine_goodie:
+					gameObjects.push_back(new LandMineGoodie(this, coord_x, coord_y));
+					break;
+				case Level::vaccine_goodie:
+					gameObjects.push_back(new VaccineGoodie(this, coord_x, coord_y));
+					break;
 				}
 			}
 		}
