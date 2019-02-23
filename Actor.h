@@ -10,9 +10,11 @@ public:
 	Actor(StudentWorld* sw, int imageID, double x, double y, int dir, int depth);
 	//virtual ~Actor();
 	virtual void doSomething() = 0;
-	virtual bool blocksMovement() = 0;
+	virtual bool blocksMovement() const = 0;
 	bool getStatus() const;
 	void setStatus(bool new_status);
+	virtual bool isCitizen() const;
+	virtual bool isZombie() const;
 	StudentWorld* getWorld() { return current_world; }
 
 private:
@@ -25,7 +27,7 @@ class MovingObjects :public Actor
 public:
 	MovingObjects(StudentWorld* sw, int imageID, double x, double y);
 	virtual void doSomething() = 0;
-	virtual bool blocksMovement();
+	virtual bool blocksMovement() const;
 };
 
 class Person :public MovingObjects
@@ -44,6 +46,7 @@ class Citizen : public Person
 public:
 	Citizen(StudentWorld* sw, double x, double y);
 	virtual void doSomething();
+	virtual bool isCitizen() const;
 };
 
 class Penelope : public Person
@@ -55,12 +58,12 @@ private:
 
 };
 
-class Zombie :public Actor
+class Zombie :public MovingObjects
 {
 public:
 	Zombie(StudentWorld* sw, double x, double y);
 	virtual void doSomething() = 0;
-	virtual bool blocksMovement();
+	virtual bool isZombie() const;
 };
 
 class SmartZombie :public Zombie
@@ -82,7 +85,7 @@ class StillObjects :public Actor
 public:
 	StillObjects(StudentWorld* sw, int imageID, double x, double y, int dir, int depth);
 	virtual void doSomething() = 0;
-	virtual bool blocksMovement();
+	virtual bool blocksMovement() const;
 };
 
 class Wall :public StillObjects
@@ -90,7 +93,7 @@ class Wall :public StillObjects
 public:
 	Wall(StudentWorld* sw, double x, double y);
 	virtual void doSomething();
-	virtual bool blocksMovement();
+	virtual bool blocksMovement() const;
 };
 
 class Exit :public StillObjects
