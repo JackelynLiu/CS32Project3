@@ -77,7 +77,8 @@ int StudentWorld::init()
 				}
 			}
 		}
-		setGameStatText("Score: 0   Level: 1   Lives: 3   Vacc: 0   Flames: 0   Mines: 0   Infected: 0");
+		string currentstats = "Score: 0   Level: 1   Lives: 3   Vacc:  0   Flames: 0   Mines: 0   Infected: 0";
+		setGameStatText(currentstats);
 	}
     return GWSTATUS_CONTINUE_GAME;
 }
@@ -137,8 +138,26 @@ bool StudentWorld::containsObstacle(double x, double y)
 	return false;
 }
 
-bool StudentWorld::determineOverlap(double x, double y)
+bool StudentWorld::determineOverlapwithPlayer(double x, double y)
 {
+	double dist_x = m_player->getX() - x;
+	double dist_y = m_player->getY() - y;
+	if (dist_x*dist_x + dist_y * dist_y <= 100) return true;
+	else return false;
+}
 
+bool StudentWorld::determineOverlapwithCitizen(double x, double y)
+{
+	vector<Actor*>::iterator it;
+	for (it = gameObjects.begin(); it != gameObjects.end(); it++)
+	{
+		if ((*it)->isCitizen())
+		{
+			double dist_x = (*it)->getX() - x;
+			double dist_y = (*it)->getY() - y;
+			if (dist_x*dist_x + dist_y * dist_y <= 100)
+				return true;
+		}
+	}
 	return false;
 }
