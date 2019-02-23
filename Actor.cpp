@@ -11,11 +11,15 @@ bool Actor::getStatus() const { return m_status; }
 
 void Actor::setStatus(bool new_status) { m_status = new_status; }
 
+bool Actor::isCitizen() const { return false; }
+
+bool Actor::isZombie() const { return false; }
+
 MovingObjects::MovingObjects(StudentWorld* sw, int imageID, double x, double y)
 	:Actor(sw, imageID, x, y, right, 0)
 {}
 
-bool MovingObjects::blocksMovement() { return true; }
+bool MovingObjects::blocksMovement() const { return true; }
 
 Person::Person(StudentWorld* sw, int imageID, double x, double y)
 	:MovingObjects(sw, imageID, x, y), m_infectedstatus(false), m_infectioncount(0)
@@ -56,8 +60,19 @@ void Penelope::doSomething()
 			if (!(getWorld()->containsObstacle(current_x, current_y + 4)))
 				moveTo(current_x, current_y + 4);
 			break;
-		/*case KEY_PRESS_SPACE:
-			break*/
+		//case KEY_PRESS_SPACE:
+		//	if (getDirection() == right)
+		//	{
+		//		double flame_coord_x = current_x + SPRITE_WIDTH;
+		//		for (int i = 0; i < 3; i++)
+		//		{
+		//			if (getWorld()->containsObstacle(flame_coord_x, current_y))
+		//				break;
+		//			Flame* x = new Flame(getWorld(), flame_coord_x, current_y, right);
+		//			flame_coord_x += SPRITE_WIDTH;
+		//		}
+		//	}
+		//	break;
 		default:
 			return;
 		}
@@ -75,11 +90,13 @@ void Citizen::doSomething()
 
 }
 
+bool Citizen::isCitizen() const { return true; }
+
 Zombie::Zombie(StudentWorld* sw, double x, double y)
-	:Actor(sw, IID_ZOMBIE, x, y, right, 0)
+	:MovingObjects(sw, IID_ZOMBIE, x, y)
 {}
 
-bool Zombie::blocksMovement() { return true; }
+bool Zombie::isZombie() const { return true; }
 
 SmartZombie::SmartZombie(StudentWorld* sw, double x, double y)
 	:Zombie(sw, x, y)
@@ -99,7 +116,7 @@ StillObjects::StillObjects(StudentWorld* sw, int imageID, double x, double y, in
 	:Actor(sw, imageID, x, y, dir, depth)
 {}
 
-bool StillObjects::blocksMovement() { return false; }
+bool StillObjects::blocksMovement() const { return false; }
 
 Wall::Wall(StudentWorld* sw, double x, double y)
 	:StillObjects(sw, IID_WALL,x, y, right, 0)
@@ -107,14 +124,19 @@ Wall::Wall(StudentWorld* sw, double x, double y)
 
 void Wall::doSomething() {}
 
-bool Wall::blocksMovement() { return true; }
+bool Wall::blocksMovement() const { return true; }
 
 Exit::Exit(StudentWorld* sw, double x, double y)
 	:StillObjects(sw, IID_EXIT, x, y, right, 1)
 {}
 
 void Exit::doSomething()
-{}
+{
+	/*if (getWorld()->determineOverlapwithPlayer(getX(), getY())
+	{
+
+	}*/
+}
 
 Pit::Pit(StudentWorld* sw, double x, double y)
 	:StillObjects(sw, IID_PIT, x, y, right, 0)
