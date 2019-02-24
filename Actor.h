@@ -13,8 +13,7 @@ public:
 	virtual bool blocksMovement() const = 0;
 	bool getStatus() const;
 	void setStatus(bool new_status);
-	virtual bool isCitizen() const;
-	virtual bool isZombie() const;
+	virtual std::string defineObjectType() const = 0;
 	StudentWorld* getWorld() { return current_world; }
 
 private:
@@ -35,18 +34,11 @@ class Person :public MovingObjects
 public:
 	Person(StudentWorld* sw, int imageID, double x, double y);
 	virtual void doSomething() = 0;
+	virtual std::string defineObjectType() const;
 
 private:
 	bool m_infectedstatus;
 	int m_infectioncount;
-};
-
-class Citizen : public Person
-{
-public:
-	Citizen(StudentWorld* sw, double x, double y);
-	virtual void doSomething();
-	virtual bool isCitizen() const;
 };
 
 class Penelope : public Person
@@ -58,12 +50,21 @@ private:
 
 };
 
+
+class Citizen :public Person
+{
+public:
+	Citizen(StudentWorld* sw, double x, double y);
+	virtual void doSomething();
+
+};
+
 class Zombie :public MovingObjects
 {
 public:
 	Zombie(StudentWorld* sw, double x, double y);
 	virtual void doSomething() = 0;
-	virtual bool isZombie() const;
+	virtual std::string defineObjectType() const;
 };
 
 class SmartZombie :public Zombie
@@ -94,6 +95,7 @@ public:
 	Wall(StudentWorld* sw, double x, double y);
 	virtual void doSomething();
 	virtual bool blocksMovement() const;
+	virtual std::string defineObjectType() const;
 };
 
 class Exit :public StillObjects
@@ -101,6 +103,7 @@ class Exit :public StillObjects
 public:
 	Exit(StudentWorld* sw, double x, double y);
 	virtual void doSomething();
+	virtual std::string defineObjectType() const;
 };
 
 class Pit :public StillObjects
@@ -108,6 +111,7 @@ class Pit :public StillObjects
 public:
 	Pit(StudentWorld* sw, double x, double y);
 	virtual void doSomething();
+	virtual std::string defineObjectType() const;
 };
 
 class Goodie :public StillObjects
@@ -115,6 +119,7 @@ class Goodie :public StillObjects
 public:
 	Goodie(StudentWorld* sw, int imageID, double x, double y);
 	virtual void doSomething() = 0;
+	virtual std::string defineObjectType() const;
 };
 
 class VaccineGoodie :public Goodie
@@ -131,18 +136,19 @@ public:
 	virtual void doSomething();
 };
 
-class LandMineGoodie :public Goodie
+class LandmineGoodie :public Goodie
 {
 public:
-	LandMineGoodie(StudentWorld* sw, double x, double y);
+	LandmineGoodie(StudentWorld* sw, double x, double y);
 	virtual void doSomething();
 };
 
-class LandMine :public Goodie
+class Landmine :public StillObjects
 {
 public:
-	LandMine(StudentWorld* sw, double x, double y);
+	Landmine(StudentWorld* sw, double x, double y);
 	virtual void doSomething();
+	virtual std::string defineObjectType() const;
 };
 
 class Projectile :public StillObjects
@@ -157,6 +163,7 @@ class Flame :public Projectile
 public:
 	Flame(StudentWorld* sw, double x, double y, int dir);
 	virtual void doSomething();
+	virtual std::string defineObjectType() const;
 };
 
 class Vomit :public Projectile
@@ -164,6 +171,7 @@ class Vomit :public Projectile
 public:
 	Vomit(StudentWorld* sw, double x, double y, int dir);
 	virtual void doSomething();
+	virtual std::string defineObjectType() const;
 };
 //Students:  Add code to this file, Actor.cpp, StudentWorld.h, and StudentWorld.cpp
 
