@@ -69,7 +69,7 @@ int StudentWorld::init()
 					gameObjects.push_back(new GasCanGoodie(this, coord_x, coord_y));
 					break;
 				case Level::landmine_goodie:
-					gameObjects.push_back(new LandMineGoodie(this, coord_x, coord_y));
+					gameObjects.push_back(new LandmineGoodie(this, coord_x, coord_y));
 					break;
 				case Level::vaccine_goodie:
 					gameObjects.push_back(new VaccineGoodie(this, coord_x, coord_y));
@@ -151,7 +151,7 @@ bool StudentWorld::determineOverlapwithCitizen(double x, double y)
 	vector<Actor*>::iterator it;
 	for (it = gameObjects.begin(); it != gameObjects.end(); it++)
 	{
-		if ((*it)->isCitizen())
+		if ((*it)->defineObjectType() == "CITIZEN")
 		{
 			double dist_x = (*it)->getX() - x;
 			double dist_y = (*it)->getY() - y;
