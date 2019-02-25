@@ -14,8 +14,11 @@ public:
 	virtual bool canbeDamaged() const;
 	virtual bool canbeInfected() const;
 	virtual bool blocksFlame() const;
+	virtual bool canExit() const;
 	bool getStatus() const;
 	void setStatus(bool new_status);
+	bool getInfectedStatus() const;
+	void setInfectedStatus(bool infected);
 	int gettickcount() const;
 	void increasetickcount();
 	virtual std::string defineObjectType() const = 0;
@@ -25,6 +28,7 @@ private:
 	StudentWorld* current_world;
 	bool m_status;
 	int m_tickcount;
+	bool m_infectedstatus;
 };
 
 class MovingObjects :public Actor
@@ -42,14 +46,12 @@ public:
 	Person(StudentWorld* sw, int imageID, double x, double y);
 	virtual void doSomething() = 0;
 	virtual bool canbeInfected() const;
-	bool getInfectedStatus() const;
-	void setInfectedStatus(bool infected);
 	int getInfectionCount() const;
 	void setInfectionCount(int n);
 	virtual std::string defineObjectType() const;
+	virtual bool canExit() const;
 
 private:
-	bool m_infectedstatus;
 	int m_infectioncount;
 };
 
