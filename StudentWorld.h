@@ -22,6 +22,11 @@ public:
 	bool determineOverlapwithPlayer(double x, double y);
 	bool determineOverlapwithCitizen(double x, double y);
 	bool determineOverlapwithZombie(double x, double y);
+	void setPenelopetoDead();
+	void setOverlappedCitizentoDead(double x, double y);
+	void setOverlappedZombietoDead(double x, double y);
+	int getNumCitizensLeft() const;
+	void getKilledbyFlame(double x, double y);
 
 private:
 	std::vector<Actor*> gameObjects;
