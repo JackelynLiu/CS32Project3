@@ -22,7 +22,7 @@ StudentWorld::~StudentWorld() { cleanUp(); }
 
 int StudentWorld::init()
 {
-	num_alivecitizens = 0;
+	num_alivecitizens, num_vaccines, num_gascans, num_landmines = 0;
 	Level lev(assetPath());
 	string levelFile = "level03.txt";
 	Level::LoadResult result = lev.loadLevel(levelFile);
@@ -78,7 +78,7 @@ int StudentWorld::init()
 				}
 			}
 		}
-		string currentstats = "Score: 0   Level: 1   Lives: 3   Vacc:  0   Flames: 0   Mines: 0   Infected: 0";
+		string currentstats = "Score: 0   Level: 1   Lives: 3   Vacc: 0   Flames: 0   Mines: 0   Infected: 0"; //how to print int
 		setGameStatText(currentstats);
 	}
     return GWSTATUS_CONTINUE_GAME;
@@ -185,7 +185,7 @@ bool StudentWorld::containsObstacleforFlame(double x, double y)
 	return false;
 }
 
-bool StudentWorld::determineOverlapwithPlayer(double x, double y)
+bool StudentWorld::ExitOverlapwithPlayer(double x, double y)
 {
 	double dist_x = m_player->getX() - x;
 	double dist_y = m_player->getY() - y;
@@ -193,79 +193,64 @@ bool StudentWorld::determineOverlapwithPlayer(double x, double y)
 	else return false;
 }
 
-bool StudentWorld::determineOverlapwithCitizen(double x, double y)
+bool StudentWorld::ExitOverlapwithCitizen(double x, double y)
 {
 	vector<Actor*>::iterator it;
 	for (it = gameObjects.begin(); it != gameObjects.end(); it++)
 	{
-		if ((*it)->defineObjectType() == "CITIZEN")
+		if ((*it)->canExit())
 		{
 			double dist_x = (*it)->getX() - x;
 			double dist_y = (*it)->getY() - y;
 			if (dist_x*dist_x + dist_y * dist_y <= 100)
+			{
+				(*it)->setStatus(false);
+				num_alivecitizens--;
 				return true;
+			}
 		}
 	}
 	return false;
 }
 
-bool StudentWorld::determineOverlapwithZombie(double x, double y)
-{
-	vector<Actor*>::iterator it;
-	for (it = gameObjects.begin(); it != gameObjects.end(); it++)
-	{
-		if ((*it)->defineObjectType() == "ZOMBIE")
-		{
-			double dist_x = (*it)->getX() - x;
-			double dist_y = (*it)->getY() - y;
-			if (dist_x*dist_x + dist_y * dist_y <= 100)
-				return true;
-		}
-	}
-	return false;
-}
+//bool StudentWorld::determineOverlapwithZombie(double x, double y)
+//{
+//	vector<Actor*>::iterator it;
+//	for (it = gameObjects.begin(); it != gameObjects.end(); it++)
+//	{
+//		if ((*it)->defineObjectType() == "ZOMBIE")
+//		{
+//			double dist_x = (*it)->getX() - x;
+//			double dist_y = (*it)->getY() - y;
+//			if (dist_x*dist_x + dist_y * dist_y <= 100)
+//				return true;
+//		}
+//	}
+//	return false;
+//}
 
 void StudentWorld::setPenelopetoDead()
 {
 	m_player->setStatus(false);
 }
 
-void StudentWorld::setOverlappedCitizentoDead(double x, double y)
-{
-	vector<Actor*>::iterator it;
-	for (it = gameObjects.begin(); it != gameObjects.end(); it++)
-	{
-		if ((*it)->defineObjectType() == "CITIZEN")
-		{
-			double dist_x = (*it)->getX() - x;
-			double dist_y = (*it)->getY() - y;
-			if (dist_x*dist_x + dist_y * dist_y <= 100)
-			{
-				(*it)->setStatus(false);
-				return;
-			}
-		}
-	}
-	num_alivecitizens--;
-}
-
-void StudentWorld::setOverlappedZombietoDead(double x, double y)
-{
-	vector<Actor*>::iterator it;
-	for (it = gameObjects.begin(); it != gameObjects.end(); it++)
-	{
-		if ((*it)->defineObjectType() == "ZOMBIE")
-		{
-			double dist_x = (*it)->getX() - x;
-			double dist_y = (*it)->getY() - y;
-			if (dist_x*dist_x + dist_y * dist_y <= 100)
-			{
-				(*it)->setStatus(false);
-				return;
-			}
-		}
-	}
-}
+//void StudentWorld::setOverlappedZombietoDead(double x, double y)
+//{
+//	vector<Actor*>::iterator it;
+//	for (it = gameObjects.begin(); it != gameObjects.end(); it++)
+//	{
+//		if ((*it)->defineObjectType() == "ZOMBIE")
+//		{
+//			double dist_x = (*it)->getX() - x;
+//			double dist_y = (*it)->getY() - y;
+//			if (dist_x*dist_x + dist_y * dist_y <= 100)
+//			{
+//				(*it)->setStatus(false);
+//				return;
+//			}
+//		}
+//	}
+//}
 
 int StudentWorld::getNumCitizensLeft() const { return num_alivecitizens; }
 
@@ -281,7 +266,23 @@ void StudentWorld::getKilledbyFlame(double x, double y)
 			if (dist_x*dist_x + dist_y * dist_y <= 100)
 			{
 				(*it)->setStatus(false);
-				return;
+			}
+		}
+	}
+}
+
+void StudentWorld::infecteverything(double x, double y)
+{
+	vector<Actor*>::iterator it;
+	for (it = gameObjects.begin(); it != gameObjects.end(); it++)
+	{
+		if ((*it)->canbeInfected())
+		{
+			double dist_x = (*it)->getX() - x;
+			double dist_y = (*it)->getY() - y;
+			if (dist_x*dist_x + dist_y * dist_y <= 100)
+			{
+				(*it)->setInfectedStatus(true);
 			}
 		}
 	}
