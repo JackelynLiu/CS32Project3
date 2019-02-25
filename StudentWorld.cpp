@@ -90,8 +90,8 @@ int StudentWorld::move()
 	for (int i = 0; i < gameObjects.size(); i++)
 		gameObjects[i]->doSomething();
 	//if (!m_player->getStatus()) return GWSTATUS_PLAYER_DIED;
-	/*vector<Actor*>::iterator it;
-	for (it = gameObjects.begin(); it != gameObjects.end(); it++)
+	vector<Actor*>::iterator it;
+	for (it = gameObjects.begin(); it != gameObjects.end();)
 	{
 		if (!(*it)->getStatus())
 		{
@@ -99,7 +99,7 @@ int StudentWorld::move()
 			it = gameObjects.erase(it);
 		}
 		else it++;
-	}*/
+	}
     // This code is here merely to allow the game to build, run, and terminate after you hit enter.
     // Notice that the return value GWSTATUS_PLAYER_DIED will cause our framework to end the current level.
     //decLives();
