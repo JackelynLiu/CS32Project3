@@ -86,6 +86,8 @@ int StudentWorld::init()
 int StudentWorld::move()
 {
 	m_player->doSomething();
+	for (int i = 0; i < gameObjects.size(); i++)
+		gameObjects[i]->doSomething();
     // This code is here merely to allow the game to build, run, and terminate after you hit enter.
     // Notice that the return value GWSTATUS_PLAYER_DIED will cause our framework to end the current level.
     //decLives();
@@ -105,6 +107,11 @@ void StudentWorld::cleanUp()
 	}
 	cout << "vector size: " << gameObjects.size() << endl;
 	cout << "Completed clean up." << endl;
+}
+
+void StudentWorld::addintovector(Actor* a)
+{
+	gameObjects.push_back(a);
 }
 
 bool StudentWorld::containsObstacle(double x, double y)
@@ -142,7 +149,7 @@ bool StudentWorld::determineOverlapwithPlayer(double x, double y)
 {
 	double dist_x = m_player->getX() - x;
 	double dist_y = m_player->getY() - y;
-	if (dist_x*dist_x + dist_y * dist_y <= 100) return true;
+	if ((dist_x*dist_x) + (dist_y * dist_y) <= 100) return true;
 	else return false;
 }
 
@@ -152,6 +159,22 @@ bool StudentWorld::determineOverlapwithCitizen(double x, double y)
 	for (it = gameObjects.begin(); it != gameObjects.end(); it++)
 	{
 		if ((*it)->defineObjectType() == "CITIZEN")
+		{
+			double dist_x = (*it)->getX() - x;
+			double dist_y = (*it)->getY() - y;
+			if (dist_x*dist_x + dist_y * dist_y <= 100)
+				return true;
+		}
+	}
+	return false;
+}
+
+bool StudentWorld::determineOverlapwithZombie(double x, double y)
+{
+	vector<Actor*>::iterator it;
+	for (it = gameObjects.begin(); it != gameObjects.end(); it++)
+	{
+		if ((*it)->defineObjectType() == "ZOMBIE")
 		{
 			double dist_x = (*it)->getX() - x;
 			double dist_y = (*it)->getY() - y;
