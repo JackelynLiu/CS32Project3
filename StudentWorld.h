@@ -19,6 +19,7 @@ public:
     virtual void cleanUp();
 	void addintovector(Actor* a);
 	bool containsObstacle(double x, double y);
+	bool containsPlayer(double x, double y);
 	bool determineOverlapwithPlayer(double x, double y);
 	bool determineOverlapwithCitizen(double x, double y);
 	//bool determineOverlapwithZombie(double x, double y);
@@ -30,8 +31,9 @@ public:
 	void infecteverything(double x, double y);
 	double distanceFromPenelope(double x, double y);
 	double distanceFromNearestZombie(double x, double y);
-	double getPenelopexcoord() const;
-	double getPenelopeycoord() const;
+	double getPenelopexcoord() const; //stop using
+	double getPenelopeycoord() const; //stop using
+	int whattofollow(double x, double y);
 
 private:
 	std::vector<Actor*> gameObjects;
