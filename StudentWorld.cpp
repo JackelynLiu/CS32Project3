@@ -185,7 +185,7 @@ bool StudentWorld::containsObstacleforFlame(double x, double y)
 	return false;
 }
 
-bool StudentWorld::ExitOverlapwithPlayer(double x, double y)
+bool StudentWorld::determineOverlapwithPlayer(double x, double y)
 {
 	double dist_x = m_player->getX() - x;
 	double dist_y = m_player->getY() - y;
@@ -193,12 +193,12 @@ bool StudentWorld::ExitOverlapwithPlayer(double x, double y)
 	else return false;
 }
 
-bool StudentWorld::ExitOverlapwithCitizen(double x, double y)
+bool StudentWorld::determineOverlapwithCitizen(double x, double y)
 {
 	vector<Actor*>::iterator it;
 	for (it = gameObjects.begin(); it != gameObjects.end(); it++)
 	{
-		if ((*it)->canExit())
+		if ((*it)->defineObjectType() == "CITIZEN")
 		{
 			double dist_x = (*it)->getX() - x;
 			double dist_y = (*it)->getY() - y;
@@ -223,7 +223,10 @@ bool StudentWorld::ExitOverlapwithCitizen(double x, double y)
 //			double dist_x = (*it)->getX() - x;
 //			double dist_y = (*it)->getY() - y;
 //			if (dist_x*dist_x + dist_y * dist_y <= 100)
+//			{
+//				(*it)->setStatus(false);
 //				return true;
+//			}
 //		}
 //	}
 //	return false;
@@ -232,6 +235,7 @@ bool StudentWorld::ExitOverlapwithCitizen(double x, double y)
 void StudentWorld::setPenelopetoDead()
 {
 	m_player->setStatus(false);
+	playSound(SOUND_PLAYER_DIE);
 }
 
 //void StudentWorld::setOverlappedZombietoDead(double x, double y)
@@ -254,7 +258,7 @@ void StudentWorld::setPenelopetoDead()
 
 int StudentWorld::getNumCitizensLeft() const { return num_alivecitizens; }
 
-void StudentWorld::getKilledbyFlame(double x, double y)
+void StudentWorld::getKilledbyFlameorPit(double x, double y)
 {
 	vector<Actor*>::iterator it;
 	for (it = gameObjects.begin(); it != gameObjects.end(); it++)
@@ -266,6 +270,13 @@ void StudentWorld::getKilledbyFlame(double x, double y)
 			if (dist_x*dist_x + dist_y * dist_y <= 100)
 			{
 				(*it)->setStatus(false);
+				if ((*it)->defineObjectType() == "CITIZEN")
+					increaseScore(-1000);
+				else if ((*it)->defineObjectType() == "SMARTZOMBIE")
+					increaseScore(2000);
+				else if ((*it)->defineObjectType() == "DUMBZOMBIE")
+					increaseScore(1000);
+
 			}
 		}
 	}
