@@ -4,7 +4,7 @@
 #include "StudentWorld.h"
 
 Actor::Actor(StudentWorld* sw, int imageID, double x, double y, int dir, int depth)
-	:GraphObject(imageID, x, y, dir, depth), current_world(sw), m_status(true), m_tickcount(0)
+	:GraphObject(imageID, x, y, dir, depth), current_world(sw), m_status(true), m_tickcount(0), m_infectedstatus(false)
 {}
 
 bool Actor::getStatus() const { return m_status; }
@@ -21,6 +21,12 @@ bool Actor::canbeInfected() const { return false; }
 
 bool Actor::blocksFlame() const { return false; }
 
+bool Actor::getInfectedStatus() const { return m_infectedstatus; }
+
+void Actor::setInfectedStatus(bool infected) { m_infectedstatus = infected; }
+
+bool Actor::canExit() const { return false; }
+
 MovingObjects::MovingObjects(StudentWorld* sw, int imageID, double x, double y)
 	:Actor(sw, imageID, x, y, right, 0)
 {}
@@ -30,14 +36,14 @@ bool MovingObjects::blocksMovement() const { return true; }
 bool MovingObjects::canbeDamaged() const { return true; }
 
 Person::Person(StudentWorld* sw, int imageID, double x, double y)
-	:MovingObjects(sw, imageID, x, y), m_infectedstatus(false), m_infectioncount(0)
+	:MovingObjects(sw, imageID, x, y), m_infectioncount(0)
 {}
 
 void Person::doSomething()
 {
 	if (!getStatus())
 		return;
-	if (m_infectedstatus)
+	if (getInfectedStatus())
 		m_infectioncount++;
 }
 
@@ -45,13 +51,11 @@ std::string Person::defineObjectType() const { return "PERSON"; }
 
 bool Person::canbeInfected() const { return true; }
 
-bool Person::getInfectedStatus() const { return m_infectedstatus; }
-
-void Person::setInfectedStatus(bool infected) { m_infectedstatus = infected; }
-
 int Person::getInfectionCount() const { return m_infectioncount; }
 
 void Person::setInfectionCount(int n) { m_infectioncount = n; }
+
+bool Person::canExit() const { return true; }
 
 Penelope::Penelope(StudentWorld* sw, double x, double y)
 	:Person(sw, IID_PLAYER, x, y)
@@ -94,6 +98,7 @@ void Penelope::doSomething()
 				moveTo(current_x, current_y + 4);
 			break;
 		case KEY_PRESS_SPACE:
+			//check if Penelope has any gascans
 			//Penelope's flamethrower charge should decrease by 1
 			getWorld()->playSound(SOUND_PLAYER_FIRE);
 			if (getDirection() == up)
@@ -101,7 +106,7 @@ void Penelope::doSomething()
 				for (int i = 0; i < 3; i++)
 				{
 					double flame_posx = current_x;
-					double flame_posy = current_y + (i+1) * SPRITE_HEIGHT;
+					double flame_posy = current_y + (i + 1) * SPRITE_HEIGHT;
 					if (getWorld()->containsObstacleforFlame(flame_posx, flame_posy))
 						break;
 					Flame* new_flame = new Flame(getWorld(), flame_posx, flame_posy, up);
@@ -144,6 +149,20 @@ void Penelope::doSomething()
 					getWorld()->addintovector(new_flame);
 				}
 			}
+			break;
+		case KEY_PRESS_TAB:
+			//check if Penelope has any landmines
+			//decrease landmine count by 1
+		{
+			Landmine* new_landmine = new Landmine(getWorld(), current_x, current_y);
+			getWorld()->addintovector(new_landmine);
+			break;
+		}
+		case KEY_PRESS_ENTER:
+			//check if Penelope has any vaccines
+			//decrease vaccines by 1
+			if (getInfectedStatus())
+				setInfectedStatus(false);
 			break;
 		default:
 			return;
@@ -221,13 +240,12 @@ Exit::Exit(StudentWorld* sw, double x, double y)
 
 void Exit::doSomething()
 {
-	if (getWorld()->determineOverlapwithCitizen(getX(), getY()))
+	if (getWorld()->ExitOverlapwithCitizen(getX(), getY()))
 	{
 		getWorld()->increaseScore(500);
-		getWorld()->setOverlappedCitizentoDead(getX(), getY());
 		getWorld()->playSound(SOUND_CITIZEN_SAVED);
 	}
-	if (getWorld()->determineOverlapwithPlayer(getX(), getY()))
+	if (getWorld()->ExitOverlapwithPlayer(getX(), getY()))
 	{
 		if (getWorld()->getNumCitizensLeft() == 0)
 			getWorld()->advanceToNextLevel();
@@ -316,5 +334,19 @@ Vomit::Vomit(StudentWorld* sw, double x, double y, int dir)
 
 std::string Vomit::defineObjectType() const { return "VOMIT"; }
 
-void Vomit::doSomething() {}
+void Vomit::doSomething()
+{
+	increasetickcount();
+	if (!getStatus())
+		return;
+	else if (gettickcount() == 2)
+	{
+		setStatus(false);
+		return;
+	}
+	else
+		getWorld()->infecteverything(getX(), getY());
+
+
+}
 
