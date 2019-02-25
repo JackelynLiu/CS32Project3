@@ -89,7 +89,7 @@ int StudentWorld::move()
 	m_player->doSomething();
 	for (int i = 0; i < gameObjects.size(); i++)
 		gameObjects[i]->doSomething();
-	//if (!m_player->getStatus()) return GWSTATUS_PLAYER_DIED;
+	if (!m_player->getStatus()) return GWSTATUS_PLAYER_DIED;
 	vector<Actor*>::iterator it;
 	for (it = gameObjects.begin(); it != gameObjects.end();)
 	{
@@ -153,6 +153,34 @@ bool StudentWorld::containsObstacle(double x, double y)
 				return true;
 		}
 		it++;
+	}
+	return false;
+}
+
+bool StudentWorld::containsObstacleforFlame(double x, double y)
+{
+	vector<Actor*>::iterator it;
+	for (it = gameObjects.begin(); it != gameObjects.end(); it++)
+	{
+		if ((*it)->blocksFlame())
+		{
+			double left_x = (*it)->getX();
+			double lower_y = (*it)->getY();
+			double right_x = left_x + SPRITE_WIDTH - 1;
+			double upper_y = lower_y + SPRITE_HEIGHT - 1;
+			if (left_x <= x && x <= right_x &&
+				lower_y <= y && y <= upper_y)
+				return true;
+			if (left_x <= x && x <= right_x &&
+				lower_y <= y + SPRITE_HEIGHT - 1 && y + SPRITE_HEIGHT - 1 <= upper_y)
+				return true;
+			if (left_x <= x + SPRITE_WIDTH - 1 && x + SPRITE_WIDTH - 1 <= right_x &&
+				lower_y <= y && y <= upper_y)
+				return true;
+			if (left_x <= x + SPRITE_WIDTH - 1 && x + SPRITE_WIDTH - 1 <= right_x &&
+				lower_y <= y + SPRITE_HEIGHT - 1 && y + SPRITE_HEIGHT - 1 <= upper_y)
+				return true;
+		}
 	}
 	return false;
 }
