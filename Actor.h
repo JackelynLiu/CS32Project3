@@ -13,6 +13,7 @@ public:
 	virtual bool blocksMovement() const = 0;
 	virtual bool canbeDamaged() const;
 	virtual bool canbeInfected() const;
+	virtual bool blocksFlame() const;
 	bool getStatus() const;
 	void setStatus(bool new_status);
 	int gettickcount() const;
@@ -99,6 +100,7 @@ public:
 	virtual void doSomething();
 	virtual bool blocksMovement() const;
 	virtual std::string defineObjectType() const;
+	virtual bool blocksFlame() const;
 };
 
 class StillObjects :public Actor
@@ -115,6 +117,7 @@ public:
 	Exit(StudentWorld* sw, double x, double y);
 	virtual void doSomething();
 	virtual std::string defineObjectType() const;
+	virtual bool blocksFlame() const;
 };
 
 class Pit :public StillObjects
