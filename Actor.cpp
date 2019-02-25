@@ -193,7 +193,97 @@ void Citizen::doSomething()
 	}
 	if (gettickcount() % 2 == 0)
 		return;
+	double dist_p = getWorld()->distanceFromPenelope(getX(), getY());
+	double dist_z = getWorld()->distanceFromNearestZombie(getX(), getY());
+	if (dist_p <= dist_z && dist_p <= 80)
+	{
+		if (getY() == getWorld()->getPenelopeycoord())			//if Penelope is in the same row
+		{
+			if (getWorld()->getPenelopexcoord() < getX())		//if Penelope is on the left
+			{
+				setDirection(left);
+				if (!getWorld()->containsObstacle(getX() - 2, getY()))
+				{
+					moveTo(getX() - 2, getY());
+					return;
+				}
+			}
+			else if (getWorld()->getPenelopexcoord() > getX())
+			{
+				setDirection(right);
+				if (!getWorld()->containsObstacle(getX() + 2, getY()))
+				{
+					moveTo(getX() + 2, getY());
+					return;
+				}
+			}
+		}
+		else if (getX() == getWorld()->getPenelopexcoord())		//if Penelope is in the same column
+		{
+			if (getWorld()->getPenelopeycoord() < getY())		//if Penelope is below
+			{
+				setDirection(down);
+				if (!getWorld()->containsObstacle(getX(), getY() - 2))
+				{
+					moveTo(getX(), getY() - 2);
+					return;
+				}
+			}
+			else if (getWorld()->getPenelopeycoord() > getY())
+			{
+				setDirection(up);
+				if (!getWorld()->containsObstacle(getX(), getY() + 2))
+				{
+					moveTo(getX(), getY() + 2);
+					return;
+				}
+			}
+		}
+		else
+		{
+			Direction h = right;
+			Direction v = up;
+			Direction f = v;
+			if (getWorld()->getPenelopexcoord() < getX())
+				h = left;
+			if (getWorld()->getPenelopeycoord() < getY())
+				v = down;
+			int choose = randInt(1, 2);
+			if (choose == 1)
+				f = h;
+			switch (f)
+			{
+			case right:
+				if (!getWorld()->containsObstacle(getX() + 2, getY()))
+				{
+					moveTo(getX() + 2, getY());
+					return;
+				}
+			case left:
+				if (!getWorld()->containsObstacle(getX() - 2, getY()))
+				{
+					moveTo(getX() - 2, getY());
+					return;
+				}
+			case up:
+				if (!getWorld()->containsObstacle(getX(), getY() + 2))
+				{
+					moveTo(getX(), getY() + 2);
+					return;
+				}
+			case down:
+				if (!getWorld()->containsObstacle(getX(), getY() - 2))
+				{
+					moveTo(getX(), getY() - 2);
+					return;
+				}
+			default:
+				break;
+			}
+				
 
+		}
+	}
 }
 
 Zombie::Zombie(StudentWorld* sw, double x, double y)
