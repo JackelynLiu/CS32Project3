@@ -15,11 +15,17 @@ int Actor::gettickcount() const { return m_tickcount; }
 
 void Actor::increasetickcount() { m_tickcount++; }
 
+bool Actor::canbeDamaged() const { return false; }
+
+bool Actor::canbeInfected() const { return false; }
+
 MovingObjects::MovingObjects(StudentWorld* sw, int imageID, double x, double y)
 	:Actor(sw, imageID, x, y, right, 0)
 {}
 
 bool MovingObjects::blocksMovement() const { return true; }
+
+bool MovingObjects::canbeDamaged() const { return true; }
 
 Person::Person(StudentWorld* sw, int imageID, double x, double y)
 	:MovingObjects(sw, imageID, x, y), m_infectedstatus(false), m_infectioncount(0)
@@ -27,11 +33,15 @@ Person::Person(StudentWorld* sw, int imageID, double x, double y)
 
 void Person::doSomething()
 {
+	if (!getStatus())
+		return;
 	if (m_infectedstatus)
 		m_infectioncount++;
 }
 
 std::string Person::defineObjectType() const { return "PERSON"; }
+
+bool Person::canbeInfected() const { return true; }
 
 bool Person::getInfectedStatus() const { return m_infectedstatus; }
 
@@ -47,9 +57,13 @@ Penelope::Penelope(StudentWorld* sw, double x, double y)
 
 void Penelope::doSomething()
 {
-	if (getWorld()->getLives() == 0)
-		return;
 	Person::doSomething();
+	if (getInfectionCount() == 500)
+	{
+		setStatus(false);
+		getWorld()->playSound(SOUND_PLAYER_DIE);
+		return;
+	}
 	int ch;
 	if (getWorld()->getKey(ch))
 	{
@@ -77,8 +91,58 @@ void Penelope::doSomething()
 			if (!(getWorld()->containsObstacle(current_x, current_y + 4)))
 				moveTo(current_x, current_y + 4);
 			break;
-		//case KEY_PRESS_SPACE:
-		//	if (getDirection() == right)
+		case KEY_PRESS_SPACE:
+			//Penelope's flamethrower charge should decrease by 1
+			getWorld()->playSound(SOUND_PLAYER_FIRE);
+			if (getDirection() == up)
+			{
+				for (int i = 0; i < 3; i++)
+				{
+					double flame_posx = current_x;
+					double flame_posy = current_y + (i+1) * SPRITE_HEIGHT;
+					if (getWorld()->containsObstacle(flame_posx, flame_posy))
+						break;
+					Flame* new_flame = new Flame(getWorld(), flame_posx, flame_posy, up);
+					getWorld()->addintovector(new_flame);
+				}
+			}
+			if (getDirection() == down)
+			{
+				for (int i = 0; i < 3; i++)
+				{
+					double flame_posx = current_x;
+					double flame_posy = current_y - (i + 1) * SPRITE_HEIGHT;
+					if (getWorld()->containsObstacle(flame_posx, flame_posy))
+						break;
+					Flame* new_flame = new Flame(getWorld(), flame_posx, flame_posy, up);
+					getWorld()->addintovector(new_flame);
+				}
+			}
+			if (getDirection() == left)
+			{
+				for (int i = 0; i < 3; i++)
+				{
+					double flame_posx = current_x - (i + 1)*SPRITE_WIDTH;
+					double flame_posy = current_y;
+					if (getWorld()->containsObstacle(flame_posx, flame_posy))
+						break;
+					Flame* new_flame = new Flame(getWorld(), flame_posx, flame_posy, up);
+					getWorld()->addintovector(new_flame);
+				}
+			}
+			if (getDirection() == right)
+			{
+				for (int i = 0; i < 3; i++)
+				{
+					double flame_posx = current_x + (i + 1)*SPRITE_WIDTH;
+					double flame_posy = current_y;
+					if (getWorld()->containsObstacle(flame_posx, flame_posy))
+						break;
+					Flame* new_flame = new Flame(getWorld(), flame_posx, flame_posy, up);
+					getWorld()->addintovector(new_flame);
+				}
+			}
+
 		//	{
 		//		double flame_coord_x = current_x + SPRITE_WIDTH;
 		//		for (int i = 0; i < 3; i++)
@@ -89,7 +153,7 @@ void Penelope::doSomething()
 		//			flame_coord_x += SPRITE_WIDTH;
 		//		}
 		//	}
-		//	break;
+			break;
 		default:
 			return;
 		}
@@ -103,8 +167,6 @@ Citizen::Citizen(StudentWorld* sw, double x, double y)
 void Citizen::doSomething()
 {
 	increasetickcount();
-	if (!getStatus())
-		return;
 	Person::doSomething();		//increases m_infectioncount here
 	if (getInfectionCount() == 500)
 	{
@@ -169,13 +231,13 @@ void Exit::doSomething()
 	if (getWorld()->determineOverlapwithCitizen(getX(), getY()))
 	{
 		getWorld()->increaseScore(500);
-		//set citizen state to dead
+		getWorld()->setOverlappedCitizentoDead(getX(), getY());
 		getWorld()->playSound(SOUND_CITIZEN_SAVED);
 	}
 	if (getWorld()->determineOverlapwithPlayer(getX(), getY()))
 	{
-		std::cout << "successfully overlapped with Penelope" << std::endl;
-		getWorld()->advanceToNextLevel();
+		if (getWorld()->getNumCitizensLeft() == 0)
+			getWorld()->advanceToNextLevel();
 	}
 }
 
@@ -194,6 +256,8 @@ Goodie::Goodie(StudentWorld* sw, int imageID, double x, double y)
 {}
 
 std::string Goodie::defineObjectType() const { return "GOODIE"; }
+
+bool Goodie::canbeDamaged() const { return true; }
 
 VaccineGoodie::VaccineGoodie(StudentWorld* sw, double x, double y)
 	: Goodie(sw, IID_VACCINE_GOODIE, x, y)
@@ -217,7 +281,10 @@ Landmine::Landmine(StudentWorld* sw, double x, double y)
 	: StillObjects(sw, IID_LANDMINE, x, y, right, 1)
 {}
 
-void Landmine::doSomething() {}
+void Landmine::doSomething()
+{}
+
+bool Landmine::canbeDamaged() const { return true; }
 
 std::string Landmine::defineObjectType() const { return "LANDMINE"; }
 
@@ -229,7 +296,20 @@ Flame::Flame(StudentWorld* sw, double x, double y, int dir)
 	: Projectile(sw, IID_FLAME, x, y, dir)
 {}
 
-void Flame::doSomething() {}
+void Flame::doSomething()
+{
+	increasetickcount();
+	if (!getStatus()) return;
+	else if (gettickcount() == 2)
+	{
+			setStatus(false);
+			return;
+	}
+	else
+	{
+		getWorld()->getKilledbyFlame(getX(), getY());
+	}
+}
 
 std::string Flame::defineObjectType() const { return "FLAME"; }
 
