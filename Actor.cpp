@@ -19,6 +19,8 @@ bool Actor::canbeDamaged() const { return false; }
 
 bool Actor::canbeInfected() const { return false; }
 
+bool Actor::blocksFlame() const { return false; }
+
 MovingObjects::MovingObjects(StudentWorld* sw, int imageID, double x, double y)
 	:Actor(sw, imageID, x, y, right, 0)
 {}
@@ -100,7 +102,7 @@ void Penelope::doSomething()
 				{
 					double flame_posx = current_x;
 					double flame_posy = current_y + (i+1) * SPRITE_HEIGHT;
-					if (getWorld()->containsObstacle(flame_posx, flame_posy))
+					if (getWorld()->containsObstacleforFlame(flame_posx, flame_posy))
 						break;
 					Flame* new_flame = new Flame(getWorld(), flame_posx, flame_posy, up);
 					getWorld()->addintovector(new_flame);
@@ -112,7 +114,7 @@ void Penelope::doSomething()
 				{
 					double flame_posx = current_x;
 					double flame_posy = current_y - (i + 1) * SPRITE_HEIGHT;
-					if (getWorld()->containsObstacle(flame_posx, flame_posy))
+					if (getWorld()->containsObstacleforFlame(flame_posx, flame_posy))
 						break;
 					Flame* new_flame = new Flame(getWorld(), flame_posx, flame_posy, up);
 					getWorld()->addintovector(new_flame);
@@ -124,7 +126,7 @@ void Penelope::doSomething()
 				{
 					double flame_posx = current_x - (i + 1)*SPRITE_WIDTH;
 					double flame_posy = current_y;
-					if (getWorld()->containsObstacle(flame_posx, flame_posy))
+					if (getWorld()->containsObstacleforFlame(flame_posx, flame_posy))
 						break;
 					Flame* new_flame = new Flame(getWorld(), flame_posx, flame_posy, up);
 					getWorld()->addintovector(new_flame);
@@ -136,23 +138,12 @@ void Penelope::doSomething()
 				{
 					double flame_posx = current_x + (i + 1)*SPRITE_WIDTH;
 					double flame_posy = current_y;
-					if (getWorld()->containsObstacle(flame_posx, flame_posy))
+					if (getWorld()->containsObstacleforFlame(flame_posx, flame_posy))
 						break;
 					Flame* new_flame = new Flame(getWorld(), flame_posx, flame_posy, up);
 					getWorld()->addintovector(new_flame);
 				}
 			}
-
-		//	{
-		//		double flame_coord_x = current_x + SPRITE_WIDTH;
-		//		for (int i = 0; i < 3; i++)
-		//		{
-		//			if (getWorld()->containsObstacle(flame_coord_x, current_y))
-		//				break;
-		//			Flame* x = new Flame(getWorld(), flame_coord_x, current_y, right);
-		//			flame_coord_x += SPRITE_WIDTH;
-		//		}
-		//	}
 			break;
 		default:
 			return;
@@ -216,6 +207,8 @@ bool Wall::blocksMovement() const { return true; }
 
 std::string Wall::defineObjectType() const { return "WALL"; }
 
+bool Wall::blocksFlame() const { return true; }
+
 StillObjects::StillObjects(StudentWorld* sw, int imageID, double x, double y, int dir, int depth)
 	:Actor(sw, imageID, x, y, dir, depth)
 {}
@@ -242,6 +235,8 @@ void Exit::doSomething()
 }
 
 std::string Exit::defineObjectType() const { return "EXIT"; }
+
+bool Exit::blocksFlame() const { return true; }
 
 Pit::Pit(StudentWorld* sw, double x, double y)
 	:StillObjects(sw, IID_PIT, x, y, right, 0)
