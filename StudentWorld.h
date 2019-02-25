@@ -19,20 +19,23 @@ public:
     virtual void cleanUp();
 	void addintovector(Actor* a);
 	bool containsObstacle(double x, double y);
-	bool determineOverlapwithPlayer(double x, double y);
-	bool determineOverlapwithCitizen(double x, double y);
-	bool determineOverlapwithZombie(double x, double y);
+	bool ExitOverlapwithPlayer(double x, double y);
+	bool ExitOverlapwithCitizen(double x, double y);
+	//bool determineOverlapwithZombie(double x, double y);
 	void setPenelopetoDead();
-	void setOverlappedCitizentoDead(double x, double y);
-	void setOverlappedZombietoDead(double x, double y);
+	//void setOverlappedZombietoDead(double x, double y);
 	int getNumCitizensLeft() const;
 	void getKilledbyFlame(double x, double y);
 	bool containsObstacleforFlame(double x, double y);
+	void infecteverything(double x, double y);
 
 private:
 	std::vector<Actor*> gameObjects;
 	Penelope* m_player;
 	int num_alivecitizens;
+	int num_vaccines;
+	int num_landmines;
+	int num_gascans;
 };
 
 #endif // STUDENTWORLD_H_
