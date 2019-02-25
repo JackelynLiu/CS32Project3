@@ -22,6 +22,7 @@ StudentWorld::~StudentWorld() { cleanUp(); }
 
 int StudentWorld::init()
 {
+	num_alivecitizens = 0;
 	Level lev(assetPath());
 	string levelFile = "level03.txt";
 	Level::LoadResult result = lev.loadLevel(levelFile);
@@ -88,6 +89,17 @@ int StudentWorld::move()
 	m_player->doSomething();
 	for (int i = 0; i < gameObjects.size(); i++)
 		gameObjects[i]->doSomething();
+	//if (!m_player->getStatus()) return GWSTATUS_PLAYER_DIED;
+	/*vector<Actor*>::iterator it;
+	for (it = gameObjects.begin(); it != gameObjects.end(); it++)
+	{
+		if (!(*it)->getStatus())
+		{
+			delete *it;
+			it = gameObjects.erase(it);
+		}
+		else it++;
+	}*/
     // This code is here merely to allow the game to build, run, and terminate after you hit enter.
     // Notice that the return value GWSTATUS_PLAYER_DIED will cause our framework to end the current level.
     //decLives();
@@ -183,4 +195,66 @@ bool StudentWorld::determineOverlapwithZombie(double x, double y)
 		}
 	}
 	return false;
+}
+
+void StudentWorld::setPenelopetoDead()
+{
+	m_player->setStatus(false);
+}
+
+void StudentWorld::setOverlappedCitizentoDead(double x, double y)
+{
+	vector<Actor*>::iterator it;
+	for (it = gameObjects.begin(); it != gameObjects.end(); it++)
+	{
+		if ((*it)->defineObjectType() == "CITIZEN")
+		{
+			double dist_x = (*it)->getX() - x;
+			double dist_y = (*it)->getY() - y;
+			if (dist_x*dist_x + dist_y * dist_y <= 100)
+			{
+				(*it)->setStatus(false);
+				return;
+			}
+		}
+	}
+	num_alivecitizens--;
+}
+
+void StudentWorld::setOverlappedZombietoDead(double x, double y)
+{
+	vector<Actor*>::iterator it;
+	for (it = gameObjects.begin(); it != gameObjects.end(); it++)
+	{
+		if ((*it)->defineObjectType() == "ZOMBIE")
+		{
+			double dist_x = (*it)->getX() - x;
+			double dist_y = (*it)->getY() - y;
+			if (dist_x*dist_x + dist_y * dist_y <= 100)
+			{
+				(*it)->setStatus(false);
+				return;
+			}
+		}
+	}
+}
+
+int StudentWorld::getNumCitizensLeft() const { return num_alivecitizens; }
+
+void StudentWorld::getKilledbyFlame(double x, double y)
+{
+	vector<Actor*>::iterator it;
+	for (it = gameObjects.begin(); it != gameObjects.end(); it++)
+	{
+		if ((*it)->canbeDamaged())
+		{
+			double dist_x = (*it)->getX() - x;
+			double dist_y = (*it)->getY() - y;
+			if (dist_x*dist_x + dist_y * dist_y <= 100)
+			{
+				(*it)->setStatus(false);
+				return;
+			}
+		}
+	}
 }
