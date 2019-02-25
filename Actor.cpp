@@ -156,8 +156,8 @@ void Penelope::doSomething()
 		{
 			Landmine* new_landmine = new Landmine(getWorld(), current_x, current_y);
 			getWorld()->addintovector(new_landmine);
-			break;
 		}
+		break;
 		case KEY_PRESS_ENTER:
 			//check if Penelope has any vaccines
 			//decrease vaccines by 1
@@ -240,12 +240,12 @@ Exit::Exit(StudentWorld* sw, double x, double y)
 
 void Exit::doSomething()
 {
-	if (getWorld()->ExitOverlapwithCitizen(getX(), getY()))
+	if (getWorld()->determineOverlapwithCitizen(getX(), getY()))
 	{
 		getWorld()->increaseScore(500);
 		getWorld()->playSound(SOUND_CITIZEN_SAVED);
 	}
-	if (getWorld()->ExitOverlapwithPlayer(getX(), getY()))
+	if (getWorld()->determineOverlapwithPlayer(getX(), getY()))
 	{
 		if (getWorld()->getNumCitizensLeft() == 0)
 			getWorld()->advanceToNextLevel();
@@ -260,7 +260,14 @@ Pit::Pit(StudentWorld* sw, double x, double y)
 	:StillObjects(sw, IID_PIT, x, y, right, 0)
 {}
 
-void Pit::doSomething() {}
+void Pit::doSomething()
+{
+	if (getWorld()->determineOverlapwithPlayer(getX(), getY()))
+	{
+		getWorld()->setPenelopetoDead();
+	}
+	getWorld()->getKilledbyFlameorPit(getX(), getY());
+}
 
 std::string Pit::defineObjectType() const { return "PIT"; }
 
@@ -320,7 +327,7 @@ void Flame::doSomething()
 	}
 	else
 	{
-		getWorld()->getKilledbyFlame(getX(), getY());
+		getWorld()->getKilledbyFlameorPit(getX(), getY());
 	}
 }
 
