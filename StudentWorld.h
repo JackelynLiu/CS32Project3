@@ -27,7 +27,7 @@ public:
 	void setOverlappedZombietoDead(double x, double y);
 	int getNumCitizensLeft() const;
 	void getKilledbyFlame(double x, double y);
-	//bool blocksFlame(double x, double y);
+	bool containsObstacleforFlame(double x, double y);
 
 private:
 	std::vector<Actor*> gameObjects;
