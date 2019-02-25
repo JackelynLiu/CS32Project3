@@ -4,12 +4,16 @@
 #include "StudentWorld.h"
 
 Actor::Actor(StudentWorld* sw, int imageID, double x, double y, int dir, int depth)
-	:GraphObject(imageID, x, y, dir, depth), current_world(sw), m_status(true)
+	:GraphObject(imageID, x, y, dir, depth), current_world(sw), m_status(true), m_tickcount(0)
 {}
 
 bool Actor::getStatus() const { return m_status; }
 
 void Actor::setStatus(bool new_status) { m_status = new_status; }
+
+int Actor::gettickcount() const { return m_tickcount; }
+
+void Actor::increasetickcount() { m_tickcount++; }
 
 MovingObjects::MovingObjects(StudentWorld* sw, int imageID, double x, double y)
 	:Actor(sw, imageID, x, y, right, 0)
@@ -21,7 +25,21 @@ Person::Person(StudentWorld* sw, int imageID, double x, double y)
 	:MovingObjects(sw, imageID, x, y), m_infectedstatus(false), m_infectioncount(0)
 {}
 
+void Person::doSomething()
+{
+	if (m_infectedstatus)
+		m_infectioncount++;
+}
+
 std::string Person::defineObjectType() const { return "PERSON"; }
+
+bool Person::getInfectedStatus() const { return m_infectedstatus; }
+
+void Person::setInfectedStatus(bool infected) { m_infectedstatus = infected; }
+
+int Person::getInfectionCount() const { return m_infectioncount; }
+
+void Person::setInfectionCount(int n) { m_infectioncount = n; }
 
 Penelope::Penelope(StudentWorld* sw, double x, double y)
 	:Person(sw, IID_PLAYER, x, y)
@@ -31,6 +49,7 @@ void Penelope::doSomething()
 {
 	if (getWorld()->getLives() == 0)
 		return;
+	Person::doSomething();
 	int ch;
 	if (getWorld()->getKey(ch))
 	{
@@ -83,7 +102,24 @@ Citizen::Citizen(StudentWorld* sw, double x, double y)
 
 void Citizen::doSomething()
 {
+	increasetickcount();
 	if (!getStatus())
+		return;
+	Person::doSomething();		//increases m_infectioncount here
+	if (getInfectionCount() == 500)
+	{
+		setStatus(false);
+		getWorld()->playSound(SOUND_ZOMBIE_BORN);
+		getWorld()->increaseScore(-1000);
+		Actor* new_Zombie;
+		int whichZombie = randInt(1, 10);
+		if (whichZombie > 3)
+			new_Zombie = new DumbZombie(getWorld(), getX(), getY());
+		else new_Zombie = new SmartZombie(getWorld(), getX(), getY());
+		getWorld()->addintovector(new_Zombie);
+		return;
+	}
+	if (gettickcount() % 2 == 0)
 		return;
 
 }
@@ -108,14 +144,8 @@ DumbZombie::DumbZombie(StudentWorld* sw, double x, double y)
 void DumbZombie::doSomething()
 {}
 
-StillObjects::StillObjects(StudentWorld* sw, int imageID, double x, double y, int dir, int depth)
-	:Actor(sw, imageID, x, y, dir, depth)
-{}
-
-bool StillObjects::blocksMovement() const { return false; }
-
 Wall::Wall(StudentWorld* sw, double x, double y)
-	:StillObjects(sw, IID_WALL,x, y, right, 0)
+	:Actor(sw, IID_WALL,x, y, right, 0)
 {}
 
 void Wall::doSomething() {}
@@ -124,16 +154,29 @@ bool Wall::blocksMovement() const { return true; }
 
 std::string Wall::defineObjectType() const { return "WALL"; }
 
+StillObjects::StillObjects(StudentWorld* sw, int imageID, double x, double y, int dir, int depth)
+	:Actor(sw, imageID, x, y, dir, depth)
+{}
+
+bool StillObjects::blocksMovement() const { return false; }
+
 Exit::Exit(StudentWorld* sw, double x, double y)
 	:StillObjects(sw, IID_EXIT, x, y, right, 1)
 {}
 
 void Exit::doSomething()
 {
-	/*if (getWorld()->determineOverlapwithPlayer(getX(), getY())
+	if (getWorld()->determineOverlapwithCitizen(getX(), getY()))
 	{
-
-	}*/
+		getWorld()->increaseScore(500);
+		//set citizen state to dead
+		getWorld()->playSound(SOUND_CITIZEN_SAVED);
+	}
+	if (getWorld()->determineOverlapwithPlayer(getX(), getY()))
+	{
+		std::cout << "successfully overlapped with Penelope" << std::endl;
+		getWorld()->advanceToNextLevel();
+	}
 }
 
 std::string Exit::defineObjectType() const { return "EXIT"; }
