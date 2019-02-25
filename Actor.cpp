@@ -280,9 +280,43 @@ void Citizen::doSomething()
 			default:
 				break;
 			}
-				
-
+			Direction f2 = f;
+			if (f == up || f == down)
+				f2 = h;
+			switch (f2)
+			{
+			case right:
+				if (!getWorld()->containsObstacle(getX() + 2, getY()))
+				{
+					moveTo(getX() + 2, getY());
+					return;
+				}
+			case left:
+				if (!getWorld()->containsObstacle(getX() - 2, getY()))
+				{
+					moveTo(getX() - 2, getY());
+					return;
+				}
+			case up:
+				if (!getWorld()->containsObstacle(getX(), getY() + 2))
+				{
+					moveTo(getX(), getY() + 2);
+					return;
+				}
+			case down:
+				if (!getWorld()->containsObstacle(getX(), getY() - 2))
+				{
+					moveTo(getX(), getY() - 2);
+					return;
+				}
+			default:
+				break;
+			}
 		}
+	}
+	if (dist_z <= 80)
+	{
+
 	}
 }
 
