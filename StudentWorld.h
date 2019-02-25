@@ -17,10 +17,11 @@ public:
     virtual int init();
     virtual int move();
     virtual void cleanUp();
+	void addintovector(Actor* a);
 	bool containsObstacle(double x, double y);
 	bool determineOverlapwithPlayer(double x, double y);
 	bool determineOverlapwithCitizen(double x, double y);
-	//bool determineOverlapwithZombie(double x, double y);
+	bool determineOverlapwithZombie(double x, double y);
 
 private:
 	std::vector<Actor*> gameObjects;
