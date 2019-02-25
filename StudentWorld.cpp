@@ -24,10 +24,10 @@ int StudentWorld::init()
 {
 	num_alivecitizens, num_vaccines, num_gascans, num_landmines = 0;
 	Level lev(assetPath());
-	string levelFile = "level03.txt";
+	string levelFile = "level04.txt";
 	Level::LoadResult result = lev.loadLevel(levelFile);
 	if (result == Level::load_fail_file_not_found)
-		cerr << "Cannot find level03.txt data file" << endl;
+		cerr << "Cannot find level04.txt data file" << endl;
 	else if (result == Level::load_fail_bad_format)
 		cerr << "Your level was improperly formatted" << endl;
 	else if (result == Level::load_success)
@@ -154,6 +154,27 @@ bool StudentWorld::containsObstacle(double x, double y)
 		}
 		it++;
 	}
+	return false;
+}
+
+bool StudentWorld::containsPlayer(double x, double y)
+{
+	double left_x = m_player->getX();
+	double lower_y = m_player->getY();
+	double right_x = left_x + SPRITE_WIDTH - 1;
+	double upper_y = lower_y + SPRITE_HEIGHT - 1;
+	if (left_x <= x && x <= right_x &&
+		lower_y <= y && y <= upper_y)
+		return true;
+	if (left_x <= x && x <= right_x &&
+		lower_y <= y + SPRITE_HEIGHT - 1 && y + SPRITE_HEIGHT - 1 <= upper_y)
+		return true;
+	if (left_x <= x + SPRITE_WIDTH - 1 && x + SPRITE_WIDTH - 1 <= right_x &&
+		lower_y <= y && y <= upper_y)
+		return true;
+	if (left_x <= x + SPRITE_WIDTH - 1 && x + SPRITE_WIDTH - 1 <= right_x &&
+		lower_y <= y + SPRITE_HEIGHT - 1 && y + SPRITE_HEIGHT - 1 <= upper_y)
+		return true;
 	return false;
 }
 
@@ -303,13 +324,13 @@ double StudentWorld::distanceFromPenelope(double x, double y)
 {
 	double dist_x = m_player->getX() - x;
 	double dist_y = m_player->getY() - y;
-	double total = sqrt(dist_x*dist_x + dist_y * dist_y);
+	double total = sqrt((dist_x*dist_x) + (dist_y * dist_y));
 	return total;
 }
 
 double StudentWorld::distanceFromNearestZombie(double x, double y)
 {
-	double min = sqrt((VIEW_HEIGHT*VIEW_HEIGHT) + (VIEW_WIDTH * VIEW_WIDTH));
+	double min = 40000000;
 	for (int i = 0; i < gameObjects.size(); i++)
 	{
 		double temp_dist = 0;
@@ -327,3 +348,12 @@ double StudentWorld::distanceFromNearestZombie(double x, double y)
 
 double StudentWorld::getPenelopexcoord() const { return m_player->getX(); }
 double StudentWorld::getPenelopeycoord() const { return m_player->getY(); }
+
+int StudentWorld::whattofollow(double x, double y)
+{
+	double dist_p = distanceFromPenelope(x, y);
+	double dist_z = distanceFromNearestZombie(x, y);
+	if (dist_p <= dist_z && dist_p <= 80)
+		return 1;
+	else return 2;
+}
