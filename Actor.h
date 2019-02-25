@@ -13,12 +13,15 @@ public:
 	virtual bool blocksMovement() const = 0;
 	bool getStatus() const;
 	void setStatus(bool new_status);
+	int gettickcount() const;
+	void increasetickcount();
 	virtual std::string defineObjectType() const = 0;
 	StudentWorld* getWorld() { return current_world; }
 
 private:
 	StudentWorld* current_world;
 	bool m_status;
+	int m_tickcount;
 };
 
 class MovingObjects :public Actor
@@ -34,6 +37,10 @@ class Person :public MovingObjects
 public:
 	Person(StudentWorld* sw, int imageID, double x, double y);
 	virtual void doSomething() = 0;
+	bool getInfectedStatus() const;
+	void setInfectedStatus(bool infected);
+	int getInfectionCount() const;
+	void setInfectionCount(int n);
 	virtual std::string defineObjectType() const;
 
 private:
@@ -89,7 +96,7 @@ public:
 	virtual bool blocksMovement() const;
 };
 
-class Wall :public StillObjects
+class Wall :public Actor
 {
 public:
 	Wall(StudentWorld* sw, double x, double y);
@@ -173,6 +180,5 @@ public:
 	virtual void doSomething();
 	virtual std::string defineObjectType() const;
 };
-//Students:  Add code to this file, Actor.cpp, StudentWorld.h, and StudentWorld.cpp
 
 #endif // ACTOR_H_
