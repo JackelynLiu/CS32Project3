@@ -298,3 +298,32 @@ void StudentWorld::infecteverything(double x, double y)
 		}
 	}
 }
+
+double StudentWorld::distanceFromPenelope(double x, double y)
+{
+	double dist_x = m_player->getX() - x;
+	double dist_y = m_player->getY() - y;
+	double total = sqrt(dist_x*dist_x + dist_y * dist_y);
+	return total;
+}
+
+double StudentWorld::distanceFromNearestZombie(double x, double y)
+{
+	double min = sqrt((VIEW_HEIGHT*VIEW_HEIGHT) + (VIEW_WIDTH * VIEW_WIDTH));
+	for (int i = 0; i < gameObjects.size(); i++)
+	{
+		double temp_dist = 0;
+		if (gameObjects[i]->defineObjectType() == "ZOMBIE")
+		{
+			double dist_x = gameObjects[i]->getX() - x;
+			double dist_y = gameObjects[i]->getY() - y;
+			temp_dist = sqrt((dist_x*dist_x) + (dist_y * dist_y));
+			if (temp_dist < min)
+				min = temp_dist;
+		}
+	}
+	return min;
+}
+
+double StudentWorld::getPenelopexcoord() const { return m_player->getX(); }
+double StudentWorld::getPenelopeycoord() const { return m_player->getY(); }
