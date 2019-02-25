@@ -19,13 +19,13 @@ public:
     virtual void cleanUp();
 	void addintovector(Actor* a);
 	bool containsObstacle(double x, double y);
-	bool ExitOverlapwithPlayer(double x, double y);
-	bool ExitOverlapwithCitizen(double x, double y);
+	bool determineOverlapwithPlayer(double x, double y);
+	bool determineOverlapwithCitizen(double x, double y);
 	//bool determineOverlapwithZombie(double x, double y);
 	void setPenelopetoDead();
 	//void setOverlappedZombietoDead(double x, double y);
 	int getNumCitizensLeft() const;
-	void getKilledbyFlame(double x, double y);
+	void getKilledbyFlameorPit(double x, double y);
 	bool containsObstacleforFlame(double x, double y);
 	void infecteverything(double x, double y);
 
