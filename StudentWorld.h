@@ -28,6 +28,10 @@ public:
 	void getKilledbyFlameorPit(double x, double y);
 	bool containsObstacleforFlame(double x, double y);
 	void infecteverything(double x, double y);
+	double distanceFromPenelope(double x, double y);
+	double distanceFromNearestZombie(double x, double y);
+	double getPenelopexcoord() const;
+	double getPenelopeycoord() const;
 
 private:
 	std::vector<Actor*> gameObjects;
