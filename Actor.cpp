@@ -178,6 +178,8 @@ void Citizen::doSomething()
 {
 	increasetickcount();
 	Person::doSomething();		//increases m_infectioncount here
+	double current_x = getX();
+	double current_y = getY();
 	if (getInfectionCount() == 500)
 	{
 		setStatus(false);
@@ -186,55 +188,60 @@ void Citizen::doSomething()
 		Actor* new_Zombie;
 		int whichZombie = randInt(1, 10);
 		if (whichZombie > 3)
-			new_Zombie = new DumbZombie(getWorld(), getX(), getY());
-		else new_Zombie = new SmartZombie(getWorld(), getX(), getY());
+			new_Zombie = new DumbZombie(getWorld(), current_x, current_y);
+		else new_Zombie = new SmartZombie(getWorld(), current_x, current_y);
 		getWorld()->addintovector(new_Zombie);
 		return;
 	}
 	if (gettickcount() % 2 == 0)
 		return;
-	double dist_p = getWorld()->distanceFromPenelope(getX(), getY());
-	double dist_z = getWorld()->distanceFromNearestZombie(getX(), getY());
-	if (dist_p <= dist_z && dist_p <= 80)
+	
+	double px = getWorld()->getPenelopexcoord();
+	double py = getWorld()->getPenelopeycoord();
+	if (getWorld()->whattofollow(current_x, current_y) == 1)
 	{
-		if (getY() == getWorld()->getPenelopeycoord())			//if Penelope is in the same row
+		if (current_y == py)			//if Penelope is in the same row
 		{
-			if (getWorld()->getPenelopexcoord() < getX())		//if Penelope is on the left
+			if (px <= current_x)		//if Penelope is on the left
 			{
 				setDirection(left);
-				if (!getWorld()->containsObstacle(getX() - 2, getY()))
+				if (!(getWorld()->containsObstacle(current_x - 2, current_y)) &&
+					!(getWorld()->containsPlayer(current_x-2, current_y)))
 				{
-					moveTo(getX() - 2, getY());
+					moveTo(current_x - 2, current_y);
 					return;
 				}
 			}
-			else if (getWorld()->getPenelopexcoord() > getX())
+			else if (px >= current_x)
 			{
 				setDirection(right);
-				if (!getWorld()->containsObstacle(getX() + 2, getY()))
+				if (!(getWorld()->containsObstacle(current_x + 2, current_y)) &&
+					!(getWorld()->containsPlayer(current_x + 2, current_y)))
 				{
-					moveTo(getX() + 2, getY());
+					moveTo(current_x + 2, current_y);
 					return;
 				}
 			}
 		}
-		else if (getX() == getWorld()->getPenelopexcoord())		//if Penelope is in the same column
+		else if (current_x == px)		//if Penelope is in the same column
 		{
-			if (getWorld()->getPenelopeycoord() < getY())		//if Penelope is below
+			if (py <= current_y)		//if Penelope is below
 			{
 				setDirection(down);
-				if (!getWorld()->containsObstacle(getX(), getY() - 2))
+				if (!(getWorld()->containsObstacle(current_x, current_y - 2)) &&
+					!(getWorld()->containsPlayer(current_x, current_y-2)))
 				{
-					moveTo(getX(), getY() - 2);
+					moveTo(current_x, current_y - 2);
 					return;
 				}
 			}
-			else if (getWorld()->getPenelopeycoord() > getY())
+			else if (py >= current_y)
 			{
 				setDirection(up);
-				if (!getWorld()->containsObstacle(getX(), getY() + 2))
+				if (!(getWorld()->containsObstacle(current_x, current_y + 2)) &&
+					!(getWorld()->containsPlayer(current_x, current_y + 2)))
 				{
-					moveTo(getX(), getY() + 2);
+					moveTo(current_x, current_y + 2);
 					return;
 				}
 			}
@@ -244,37 +251,43 @@ void Citizen::doSomething()
 			Direction h = right;
 			Direction v = up;
 			Direction f = v;
-			if (getWorld()->getPenelopexcoord() < getX())
+			if (px <= current_x)
 				h = left;
-			if (getWorld()->getPenelopeycoord() < getY())
+			if (py <= current_y)
 				v = down;
 			int choose = randInt(1, 2);
 			if (choose == 1)
 				f = h;
+			else f = v;
+			setDirection(f);
 			switch (f)
 			{
 			case right:
-				if (!getWorld()->containsObstacle(getX() + 2, getY()))
+				if (!(getWorld()->containsObstacle(current_x + 2, current_y)) &&
+					!(getWorld()->containsPlayer(current_x + 2, current_y)))
 				{
-					moveTo(getX() + 2, getY());
+					moveTo(current_x + 2, current_y);
 					return;
 				}
 			case left:
-				if (!getWorld()->containsObstacle(getX() - 2, getY()))
+				if (!(getWorld()->containsObstacle(current_x - 2, current_y)) &&
+					!(getWorld()->containsPlayer(current_x - 2, current_y)))
 				{
-					moveTo(getX() - 2, getY());
+					moveTo(current_x - 2, current_y);
 					return;
 				}
 			case up:
-				if (!getWorld()->containsObstacle(getX(), getY() + 2))
+				if (!(getWorld()->containsObstacle(current_x, current_y + 2)) &&
+					!(getWorld()->containsPlayer(current_x, current_y + 2)))
 				{
-					moveTo(getX(), getY() + 2);
+					moveTo(current_x, current_y + 2);
 					return;
 				}
 			case down:
-				if (!getWorld()->containsObstacle(getX(), getY() - 2))
+				if (!(getWorld()->containsObstacle(current_x, current_y - 2)) &&
+					!(getWorld()->containsPlayer(current_x, current_y - 2)))
 				{
-					moveTo(getX(), getY() - 2);
+					moveTo(current_x, current_y - 2);
 					return;
 				}
 			default:
@@ -283,30 +296,36 @@ void Citizen::doSomething()
 			Direction f2 = f;
 			if (f == up || f == down)
 				f2 = h;
+			//else f2 = v;
+			setDirection(f2);
 			switch (f2)
 			{
 			case right:
-				if (!getWorld()->containsObstacle(getX() + 2, getY()))
+				if (!(getWorld()->containsObstacle(current_x + 2, current_y)) &&
+					!(getWorld()->containsPlayer(current_x + 2, current_y)))
 				{
-					moveTo(getX() + 2, getY());
+					moveTo(current_x + 2, current_y);
 					return;
 				}
 			case left:
-				if (!getWorld()->containsObstacle(getX() - 2, getY()))
+				if (!(getWorld()->containsObstacle(current_x - 2, current_y)) &&
+					!(getWorld()->containsPlayer(current_x - 2, current_y)))
 				{
-					moveTo(getX() - 2, getY());
+					moveTo(current_x - 2, current_y);
 					return;
 				}
 			case up:
-				if (!getWorld()->containsObstacle(getX(), getY() + 2))
+				if (!(getWorld()->containsObstacle(current_x, current_y + 2)) &&
+					!(getWorld()->containsPlayer(current_x, current_y + 2)))
 				{
-					moveTo(getX(), getY() + 2);
+					moveTo(current_x, current_y + 2);
 					return;
 				}
 			case down:
-				if (!getWorld()->containsObstacle(getX(), getY() - 2))
+				if (!(getWorld()->containsObstacle(current_x, current_y - 2)) &&
+					!(getWorld()->containsPlayer(current_x, current_y - 2)))
 				{
-					moveTo(getX(), getY() - 2);
+					moveTo(current_x, current_y - 2);
 					return;
 				}
 			default:
@@ -314,9 +333,9 @@ void Citizen::doSomething()
 			}
 		}
 	}
-	if (dist_z <= 80)
+	if (getWorld()->whattofollow(current_x, current_y) == 2)
 	{
-
+		return;
 	}
 }
 
