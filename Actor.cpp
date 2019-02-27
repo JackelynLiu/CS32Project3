@@ -517,13 +517,39 @@ void LandmineGoodie::pickup(Penelope * p)
 }
 
 Landmine::Landmine(StudentWorld* sw, double x, double y)
-	: StillObjects(sw, IID_LANDMINE, x, y, right, 1)
+	: StillObjects(sw, IID_LANDMINE, x, y, right, 1), m_active(false)
 {}
 
 void Landmine::doSomething()
-{}
+{
+	if (!getStatus()) return;
+	if (gettickcount() == 30)
+	{
+		m_active == true;
+	}
+	if (m_active)
+		if (getWorld()->determineOverlapwithPlayer(getX(), getY()))
+			explode();
+	increasetickcount();
+}
 
 bool Landmine::canbeDamaged() const { return true; }
+
+void Landmine::explode()
+{
+	setStatus(false);
+	getWorld()->playSound(SOUND_LANDMINE_EXPLODE);
+	getWorld()->addintovector(new Flame(getWorld(), getX(), getY(), right));
+	getWorld()->addintovector(new Flame(getWorld(), getX() - SPRITE_WIDTH, getY(), right));
+	getWorld()->addintovector(new Flame(getWorld(), getX() + SPRITE_WIDTH, getY(), right));
+	getWorld()->addintovector(new Flame(getWorld(), getX(), getY() - SPRITE_HEIGHT, right));
+	getWorld()->addintovector(new Flame(getWorld(), getX(), getY() + SPRITE_HEIGHT, right));
+	getWorld()->addintovector(new Flame(getWorld(), getX() - SPRITE_WIDTH, getY() + SPRITE_HEIGHT, right));
+	getWorld()->addintovector(new Flame(getWorld(), getX() + SPRITE_WIDTH, getY() + SPRITE_HEIGHT, right));
+	getWorld()->addintovector(new Flame(getWorld(), getX() - SPRITE_WIDTH, getY() - SPRITE_HEIGHT, right));
+	getWorld()->addintovector(new Flame(getWorld(), getX() + SPRITE_WIDTH, getY() - SPRITE_HEIGHT, right));
+	getWorld()->addintovector(new Pit(getWorld(), getX(), getY()));
+}
 
 std::string Landmine::defineObjectType() const { return "LANDMINE"; }
 
