@@ -38,6 +38,7 @@ public:
 	double getPenelopeycoord() const; //stop using
 	int whattofollow(double x, double y);
 
+	void pickupGoodies(double x, double y);
 
 	//void recordCitizenGone();
 	//void recordLevelFinishedIfAllCitizensGone();
