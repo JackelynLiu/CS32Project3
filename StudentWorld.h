@@ -13,11 +13,14 @@ class StudentWorld : public GameWorld
 {
 public:
     StudentWorld(std::string assetPath);
-	~StudentWorld();
+	virtual ~StudentWorld();
+
     virtual int init();
     virtual int move();
     virtual void cleanUp();
+
 	void addintovector(Actor* a);
+
 	bool containsObstacle(double x, double y);
 	bool containsPlayer(double x, double y);
 	bool determineOverlapwithPlayer(double x, double y);
@@ -35,13 +38,15 @@ public:
 	double getPenelopeycoord() const; //stop using
 	int whattofollow(double x, double y);
 
+
+	//void recordCitizenGone();
+	//void recordLevelFinishedIfAllCitizensGone();
+	//bool isMovingObjectBlockedAt(double x, double y) const;
+
 private:
 	std::vector<Actor*> gameObjects;
 	Penelope* m_player;
 	int num_alivecitizens;
-	int num_vaccines;
-	int num_landmines;
-	int num_gascans;
 };
 
 #endif // STUDENTWORLD_H_
