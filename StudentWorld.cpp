@@ -314,6 +314,11 @@ void StudentWorld::getKilledbyFlameorPit(double x, double y)
 
 void StudentWorld::infecteverything(double x, double y)
 {
+	if (determineOverlapwithPlayer(x, y))
+	{
+		m_player->setInfectedStatus(true);
+		cerr << "player infected" << endl;
+	}
 	vector<Actor*>::iterator it;
 	for (it = gameObjects.begin(); it != gameObjects.end(); it++)
 	{
@@ -378,4 +383,24 @@ void StudentWorld::pickupGoodies(double x, double y)
 	std::cerr << m_player->getNumVaccines();
 	std::cerr << m_player->getNumFlameCharges();
 	std::cerr << m_player->getNumLandmines();
+}
+
+bool StudentWorld::isLandmineTriggered(double x, double y)
+{
+	if (determineOverlapwithPlayer(x, y)) return true;
+	vector<Actor*>::iterator it;
+	for (it = gameObjects.begin(); it != gameObjects.end(); it++)
+	{
+		if ((*it)->canactivateLandmine())
+		{
+			double dist_x = (*it)->getX() - x;
+			double dist_y = (*it)->getY() - y;
+			if (dist_x*dist_x + dist_y * dist_y <= 100)
+			{
+				return true;
+				cerr << "triggered landmine" << endl;
+			}
+		}
+	}
+	return false;
 }
