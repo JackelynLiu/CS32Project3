@@ -22,6 +22,9 @@ public:
 	int gettickcount() const;
 	void increasetickcount();
 	virtual std::string defineObjectType() const = 0;
+	virtual bool isGoodie() const;
+	virtual void pickup(Actor* p) {}
+	bool isAt(double x, double y);
 	StudentWorld* getWorld() { return current_world; }
 
 private:
@@ -149,6 +152,8 @@ public:
 	virtual void doSomething() = 0;
 	virtual std::string defineObjectType() const;
 	virtual bool canbeDamaged() const;
+	virtual void pickup(Penelope* p) = 0;
+	virtual bool isGoodie() const;
 };
 
 class VaccineGoodie :public Goodie
@@ -156,6 +161,7 @@ class VaccineGoodie :public Goodie
 public:
 	VaccineGoodie(StudentWorld* sw, double x, double y);
 	virtual void doSomething();
+	virtual void pickup(Penelope* p);
 };
 
 class GasCanGoodie :public Goodie
@@ -163,6 +169,7 @@ class GasCanGoodie :public Goodie
 public:
 	GasCanGoodie(StudentWorld* sw, double x, double y);
 	virtual void doSomething();
+	virtual void pickup(Penelope* p);
 };
 
 class LandmineGoodie :public Goodie
@@ -170,6 +177,7 @@ class LandmineGoodie :public Goodie
 public:
 	LandmineGoodie(StudentWorld* sw, double x, double y);
 	virtual void doSomething();
+	virtual void pickup(Penelope* p);
 };
 
 class Landmine :public StillObjects
