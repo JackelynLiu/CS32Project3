@@ -58,7 +58,7 @@ void Person::setInfectionCount(int n) { m_infectioncount = n; }
 bool Person::canExit() const { return true; }
 
 Penelope::Penelope(StudentWorld* sw, double x, double y)
-	:Person(sw, IID_PLAYER, x, y)
+	:Person(sw, IID_PLAYER, x, y), num_vaccines(0), num_landmines(0), num_flamecharges(0)
 {}
 
 void Penelope::doSomething()
@@ -98,8 +98,9 @@ void Penelope::doSomething()
 				moveTo(current_x, current_y + 4);
 			break;
 		case KEY_PRESS_SPACE:
-			//check if Penelope has any gascans
-			//Penelope's flamethrower charge should decrease by 1
+			if (num_flamecharges == 0)
+				return;
+			else num_flamecharges--;
 			getWorld()->playSound(SOUND_PLAYER_FIRE);
 			if (getDirection() == up)
 			{
@@ -151,9 +152,10 @@ void Penelope::doSomething()
 			}
 			break;
 		case KEY_PRESS_TAB:
-			//check if Penelope has any landmines
-			//decrease landmine count by 1
 		{
+			if (num_landmines == 0)
+				return;
+			else num_landmines--;
 			Landmine* new_landmine = new Landmine(getWorld(), current_x, current_y);
 			getWorld()->addintovector(new_landmine);
 		}
@@ -169,6 +171,27 @@ void Penelope::doSomething()
 		}
 	}
 }
+
+void Penelope::increaseVaccines()
+{
+	num_vaccines++;
+}
+
+void Penelope::increaseFlameCharges()
+{
+	num_flamecharges += 5;
+}
+
+void Penelope::increaseLandmines()
+{
+	num_landmines += 2;
+}
+
+int Penelope::getNumVaccines() const { return num_vaccines; }
+int Penelope::getNumFlameCharges() const { return num_flamecharges; }
+int Penelope::getNumLandmines() const{ return num_landmines; }
+
+
 
 Citizen::Citizen(StudentWorld* sw, double x, double y)
 	:Person(sw, IID_CITIZEN, x, y)
