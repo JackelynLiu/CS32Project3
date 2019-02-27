@@ -27,6 +27,15 @@ void Actor::setInfectedStatus(bool infected) { m_infectedstatus = infected; }
 
 bool Actor::canExit() const { return false; }
 
+bool Actor::isGoodie() const { return false; }
+
+bool Actor::isAt(double x, double y)
+{
+	if (getX() == x && getY() == y)
+		return true;
+	else return false;
+}
+
 MovingObjects::MovingObjects(StudentWorld* sw, int imageID, double x, double y)
 	:Actor(sw, imageID, x, y, right, 0)
 {}
@@ -98,8 +107,9 @@ void Penelope::doSomething()
 				moveTo(current_x, current_y + 4);
 			break;
 		case KEY_PRESS_SPACE:
+		{
 			if (num_flamecharges == 0)
-				return;
+				break;
 			else num_flamecharges--;
 			getWorld()->playSound(SOUND_PLAYER_FIRE);
 			if (getDirection() == up)
@@ -151,21 +161,25 @@ void Penelope::doSomething()
 				}
 			}
 			break;
+		}
 		case KEY_PRESS_TAB:
 		{
 			if (num_landmines == 0)
-				return;
+				break;
 			else num_landmines--;
 			Landmine* new_landmine = new Landmine(getWorld(), current_x, current_y);
 			getWorld()->addintovector(new_landmine);
+			break;
 		}
-		break;
 		case KEY_PRESS_ENTER:
-			//check if Penelope has any vaccines
-			//decrease vaccines by 1
+		{
+			if (num_vaccines == 0)
+				break;
+			else num_vaccines--;
 			if (getInfectedStatus())
 				setInfectedStatus(false);
 			break;
+		}
 		default:
 			return;
 		}
@@ -445,11 +459,28 @@ std::string Goodie::defineObjectType() const { return "GOODIE"; }
 
 bool Goodie::canbeDamaged() const { return true; }
 
+bool Goodie::isGoodie() const { return true; }
+
 VaccineGoodie::VaccineGoodie(StudentWorld* sw, double x, double y)
 	: Goodie(sw, IID_VACCINE_GOODIE, x, y)
 {}
 
-void VaccineGoodie::doSomething() {}
+void VaccineGoodie::doSomething()
+{
+	if (!getStatus()) return;
+	if (getWorld()->determineOverlapwithPlayer(getX(), getY()))
+	{
+		setStatus(false);
+		getWorld()->playSound(SOUND_GOT_GOODIE);
+		getWorld()->increaseScore(50);
+		getWorld()->pickupGoodies(getX(), getY());
+	}
+}
+
+void VaccineGoodie::pickup(Penelope *p)
+{
+	p->increaseVaccines();
+}
 
 GasCanGoodie::GasCanGoodie(StudentWorld* sw, double x, double y)
 	:Goodie(sw, IID_GAS_CAN_GOODIE, x, y)
@@ -457,11 +488,21 @@ GasCanGoodie::GasCanGoodie(StudentWorld* sw, double x, double y)
 
 void GasCanGoodie::doSomething() {}
 
+void GasCanGoodie::pickup(Penelope* p)
+{
+	p->increaseFlameCharges();
+}
+
 LandmineGoodie::LandmineGoodie(StudentWorld* sw, double x, double y)
 	: Goodie(sw, IID_LANDMINE_GOODIE, x, y)
 {}
 
 void LandmineGoodie::doSomething() {}
+
+void LandmineGoodie::pickup(Penelope * p)
+{
+	p->increaseLandmines();
+}
 
 Landmine::Landmine(StudentWorld* sw, double x, double y)
 	: StillObjects(sw, IID_LANDMINE, x, y, right, 1)
