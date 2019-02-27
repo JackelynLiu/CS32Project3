@@ -26,6 +26,7 @@ public:
 	virtual bool isGoodie() const;
 	virtual void pickup(Penelope* p) {}
 	bool isAt(double x, double y);
+	virtual bool canactivateLandmine() const;
 	StudentWorld* getWorld() { return current_world; }
 
 private:
@@ -42,6 +43,7 @@ public:
 	virtual void doSomething() = 0;
 	virtual bool blocksMovement() const;
 	virtual bool canbeDamaged() const;
+	virtual bool canactivateLandmine() const;
 };
 
 class Person :public MovingObjects
@@ -187,7 +189,6 @@ public:
 	Landmine(StudentWorld* sw, double x, double y);
 	virtual void doSomething();
 	virtual std::string defineObjectType() const;
-	virtual bool canbeDamaged() const;
 	void explode();
 
 private:
@@ -207,6 +208,7 @@ public:
 	Flame(StudentWorld* sw, double x, double y, int dir);
 	virtual void doSomething();
 	virtual std::string defineObjectType() const;
+	virtual bool canactivateLandmine() const;
 };
 
 class Vomit :public Projectile
