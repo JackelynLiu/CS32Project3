@@ -455,6 +455,19 @@ Goodie::Goodie(StudentWorld* sw, int imageID, double x, double y)
 	:StillObjects(sw, imageID, x, y, right, 1)
 {}
 
+void Goodie::doSomething()
+{
+	if (!getStatus()) return;
+	if (getWorld()->determineOverlapwithPlayer(getX(), getY()))
+	{
+		setStatus(false);
+		getWorld()->playSound(SOUND_GOT_GOODIE);
+		getWorld()->increaseScore(50);
+		getWorld()->pickupGoodies(getX(), getY());
+		
+	}
+}
+
 std::string Goodie::defineObjectType() const { return "GOODIE"; }
 
 bool Goodie::canbeDamaged() const { return true; }
@@ -467,14 +480,7 @@ VaccineGoodie::VaccineGoodie(StudentWorld* sw, double x, double y)
 
 void VaccineGoodie::doSomething()
 {
-	if (!getStatus()) return;
-	if (getWorld()->determineOverlapwithPlayer(getX(), getY()))
-	{
-		setStatus(false);
-		getWorld()->playSound(SOUND_GOT_GOODIE);
-		getWorld()->increaseScore(50);
-		getWorld()->pickupGoodies(getX(), getY());
-	}
+	Goodie::doSomething();
 }
 
 void VaccineGoodie::pickup(Penelope *p)
@@ -486,7 +492,10 @@ GasCanGoodie::GasCanGoodie(StudentWorld* sw, double x, double y)
 	:Goodie(sw, IID_GAS_CAN_GOODIE, x, y)
 {}
 
-void GasCanGoodie::doSomething() {}
+void GasCanGoodie::doSomething()
+{
+	Goodie::doSomething();
+}
 
 void GasCanGoodie::pickup(Penelope* p)
 {
@@ -497,7 +506,10 @@ LandmineGoodie::LandmineGoodie(StudentWorld* sw, double x, double y)
 	: Goodie(sw, IID_LANDMINE_GOODIE, x, y)
 {}
 
-void LandmineGoodie::doSomething() {}
+void LandmineGoodie::doSomething()
+{
+	Goodie::doSomething();
+}
 
 void LandmineGoodie::pickup(Penelope * p)
 {
