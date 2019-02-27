@@ -3,6 +3,7 @@
 
 #include "GraphObject.h"
 class StudentWorld;
+class Penelope;
 
 class Actor :public GraphObject
 {
@@ -23,7 +24,7 @@ public:
 	void increasetickcount();
 	virtual std::string defineObjectType() const = 0;
 	virtual bool isGoodie() const;
-	virtual void pickup(Actor* p) {}
+	virtual void pickup(Penelope* p) {}
 	bool isAt(double x, double y);
 	StudentWorld* getWorld() { return current_world; }
 
@@ -149,7 +150,7 @@ class Goodie :public StillObjects
 {
 public:
 	Goodie(StudentWorld* sw, int imageID, double x, double y);
-	virtual void doSomething() = 0;
+	virtual void doSomething();
 	virtual std::string defineObjectType() const;
 	virtual bool canbeDamaged() const;
 	virtual void pickup(Penelope* p) = 0;
