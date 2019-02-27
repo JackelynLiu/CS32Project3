@@ -3,6 +3,8 @@
 #include "Actor.h"
 #include "Level.h"
 #include <string>
+#include <iostream>
+#include <sstream>
 using namespace std;
 
 GameWorld* createStudentWorld(string assetPath)
@@ -22,7 +24,7 @@ StudentWorld::~StudentWorld() { cleanUp(); }
 
 int StudentWorld::init()
 {
-	num_alivecitizens, num_vaccines, num_gascans, num_landmines = 0;
+	num_alivecitizens = 0;
 	Level lev(assetPath());
 	string levelFile = "level04.txt";
 	Level::LoadResult result = lev.loadLevel(levelFile);
@@ -78,7 +80,11 @@ int StudentWorld::init()
 				}
 			}
 		}
-		string currentstats = "Score: 0   Level: 1   Lives: 3   Vacc: 0   Flames: 0   Mines: 0   Infected: 0"; //how to print int
+
+		ostringstream oss;
+		oss << "Score: " << getScore() << "   Level: " << getLevel() << "   Lives: " << getLives() << "   Vacc: " << m_player->getNumVaccines() <<
+			"   Flames: " << m_player->getNumFlameCharges() << "   Mines: " << m_player->getNumLandmines() << "   Infected: " << m_player->getInfectionCount();
+		string currentstats = oss.str();
 		setGameStatText(currentstats);
 	}
     return GWSTATUS_CONTINUE_GAME;
