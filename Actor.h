@@ -60,7 +60,19 @@ class Penelope : public Person
 public:
 	Penelope(StudentWorld* sw, double x, double y);
 	virtual void doSomething();
+	/*virtual void useExitIfAppropriate();
+	virtual void dieByFallOrBurnIfAppropriate();
+	virtual void pickUpGoodieIfAppropriate(Goodie* g);*/
+
+	void increaseVaccines();
+	void increaseFlameCharges();
+	void increaseLandmines();
+	int getNumVaccines() const;
+	int getNumFlameCharges() const;
+	int getNumLandmines() const;
+
 private:
+	int num_vaccines, num_landmines, num_flamecharges;
 
 };
 
