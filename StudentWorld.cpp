@@ -82,8 +82,8 @@ int StudentWorld::init()
 		}
 
 		ostringstream oss;
-		oss << "Score: " << getScore() << "   Level: " << getLevel() << "   Lives: " << getLives() << "   Vacc: " << m_player->getNumVaccines() <<
-			"   Flames: " << m_player->getNumFlameCharges() << "   Mines: " << m_player->getNumLandmines() << "   Infected: " << m_player->getInfectionCount();
+		oss << "Score: " << getScore() << "  Level: " << getLevel() << "  Lives: " << getLives() << "  Vaccines: " << m_player->getNumVaccines() <<
+			"  Flames: " << m_player->getNumFlameCharges() << "  Mines: " << m_player->getNumLandmines() << "  Infected: " << m_player->getInfectionCount();
 		string currentstats = oss.str();
 		setGameStatText(currentstats);
 	}
@@ -298,7 +298,10 @@ void StudentWorld::getKilledbyFlameorPit(double x, double y)
 			{
 				(*it)->setStatus(false);
 				if ((*it)->defineObjectType() == "CITIZEN")
+				{
 					increaseScore(-1000);
+					cerr << "killed citizen";
+				}
 				else if ((*it)->defineObjectType() == "SMARTZOMBIE")
 					increaseScore(2000);
 				else if ((*it)->defineObjectType() == "DUMBZOMBIE")
@@ -362,4 +365,15 @@ int StudentWorld::whattofollow(double x, double y)
 	if (dist_p <= dist_z && dist_p <= 80)
 		return 1;
 	else return 2;
+}
+
+void StudentWorld::pickupGoodies(double x, double y)
+{
+	vector<Actor*>::iterator it;
+	for (it = gameObjects.begin(); it != gameObjects.end(); it++)
+	{
+		if ((*it)->isAt(x, y) && (*it)->isGoodie())
+			(*it)->pickup(m_player);
+	}
+	cerr << m_player->getNumVaccines();
 }
