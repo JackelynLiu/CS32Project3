@@ -37,6 +37,7 @@ public:
 	double getPenelopexcoord() const; //stop using
 	double getPenelopeycoord() const; //stop using
 	int whattofollow(double x, double y);
+	bool isLandmineTriggered(double x, double y);
 
 	void pickupGoodies(double x, double y);
 
