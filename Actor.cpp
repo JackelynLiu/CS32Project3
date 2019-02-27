@@ -92,27 +92,26 @@ void Penelope::doSomething()
 		{
 		case KEY_PRESS_LEFT:
 			setDirection(left);
-			if (!(getWorld()->containsObstacle(current_x - 4, current_y)))
+			if (!(getWorld()->containsObstacle(current_x, current_y, current_x - 4, current_y)))
 				moveTo(current_x - 4, current_y);
 			break;
 		case KEY_PRESS_RIGHT:
 			setDirection(right);
-			if (!(getWorld()->containsObstacle(current_x + 4, current_y)))
+			if (!(getWorld()->containsObstacle(current_x, current_y, current_x + 4, current_y)))
 				moveTo(current_x + 4, current_y);
 			break;
 		case KEY_PRESS_DOWN:
 			setDirection(down);
-			if (!(getWorld()->containsObstacle(current_x, current_y - 4)))
+			if (!(getWorld()->containsObstacle(current_x, current_y, current_x, current_y - 4)))
 				moveTo(current_x, current_y - 4);
 			break;
 		case KEY_PRESS_UP:
 			setDirection(up);
-			if (!(getWorld()->containsObstacle(current_x, current_y + 4)))
+			if (!(getWorld()->containsObstacle(current_x, current_y, current_x, current_y + 4)))
 				moveTo(current_x, current_y + 4);
 			break;
 		case KEY_PRESS_SPACE:
 		{
-			getWorld()->addintovector(new Vomit(getWorld(), getX() - SPRITE_WIDTH, getY(), right));
 			if (num_flamecharges == 0)
 				break;
 			else num_flamecharges--;
@@ -247,7 +246,7 @@ void Citizen::doSomething()
 			if (px <= current_x)		//if Penelope is on the left
 			{
 				setDirection(left);
-				if (!(getWorld()->containsObstacle(current_x - 2, current_y)) &&
+				if (!(getWorld()->containsObstacle(current_x, current_y, current_x - 2, current_y)) &&
 					!(getWorld()->containsPlayer(current_x-2, current_y)))
 				{
 					moveTo(current_x - 2, current_y);
@@ -257,7 +256,7 @@ void Citizen::doSomething()
 			else if (px >= current_x)
 			{
 				setDirection(right);
-				if (!(getWorld()->containsObstacle(current_x + 2, current_y)) &&
+				if (!(getWorld()->containsObstacle(current_x, current_y, current_x + 2, current_y)) &&
 					!(getWorld()->containsPlayer(current_x + 2, current_y)))
 				{
 					moveTo(current_x + 2, current_y);
@@ -270,7 +269,7 @@ void Citizen::doSomething()
 			if (py <= current_y)		//if Penelope is below
 			{
 				setDirection(down);
-				if (!(getWorld()->containsObstacle(current_x, current_y - 2)) &&
+				if (!(getWorld()->containsObstacle(current_x, current_y, current_x, current_y - 2)) &&
 					!(getWorld()->containsPlayer(current_x, current_y-2)))
 				{
 					moveTo(current_x, current_y - 2);
@@ -280,7 +279,7 @@ void Citizen::doSomething()
 			else if (py >= current_y)
 			{
 				setDirection(up);
-				if (!(getWorld()->containsObstacle(current_x, current_y + 2)) &&
+				if (!(getWorld()->containsObstacle(current_x, current_y, current_x, current_y + 2)) &&
 					!(getWorld()->containsPlayer(current_x, current_y + 2)))
 				{
 					moveTo(current_x, current_y + 2);
@@ -305,28 +304,28 @@ void Citizen::doSomething()
 			switch (f)
 			{
 			case right:
-				if (!(getWorld()->containsObstacle(current_x + 2, current_y)) &&
+				if (!(getWorld()->containsObstacle(current_x, current_y, current_x + 2, current_y)) &&
 					!(getWorld()->containsPlayer(current_x + 2, current_y)))
 				{
 					moveTo(current_x + 2, current_y);
 					return;
 				}
 			case left:
-				if (!(getWorld()->containsObstacle(current_x - 2, current_y)) &&
+				if (!(getWorld()->containsObstacle(current_x, current_y, current_x - 2, current_y)) &&
 					!(getWorld()->containsPlayer(current_x - 2, current_y)))
 				{
 					moveTo(current_x - 2, current_y);
 					return;
 				}
 			case up:
-				if (!(getWorld()->containsObstacle(current_x, current_y + 2)) &&
+				if (!(getWorld()->containsObstacle(current_x, current_y, current_x, current_y + 2)) &&
 					!(getWorld()->containsPlayer(current_x, current_y + 2)))
 				{
 					moveTo(current_x, current_y + 2);
 					return;
 				}
 			case down:
-				if (!(getWorld()->containsObstacle(current_x, current_y - 2)) &&
+				if (!(getWorld()->containsObstacle(current_x, current_y, current_x, current_y - 2)) &&
 					!(getWorld()->containsPlayer(current_x, current_y - 2)))
 				{
 					moveTo(current_x, current_y - 2);
@@ -343,28 +342,28 @@ void Citizen::doSomething()
 			switch (f2)
 			{
 			case right:
-				if (!(getWorld()->containsObstacle(current_x + 2, current_y)) &&
+				if (!(getWorld()->containsObstacle(current_x, current_y, current_x + 2, current_y)) &&
 					!(getWorld()->containsPlayer(current_x + 2, current_y)))
 				{
 					moveTo(current_x + 2, current_y);
 					return;
 				}
 			case left:
-				if (!(getWorld()->containsObstacle(current_x - 2, current_y)) &&
+				if (!(getWorld()->containsObstacle(current_x, current_y, current_x - 2, current_y)) &&
 					!(getWorld()->containsPlayer(current_x - 2, current_y)))
 				{
 					moveTo(current_x - 2, current_y);
 					return;
 				}
 			case up:
-				if (!(getWorld()->containsObstacle(current_x, current_y + 2)) &&
+				if (!(getWorld()->containsObstacle(current_x, current_y, current_x, current_y + 2)) &&
 					!(getWorld()->containsPlayer(current_x, current_y + 2)))
 				{
 					moveTo(current_x, current_y + 2);
 					return;
 				}
 			case down:
-				if (!(getWorld()->containsObstacle(current_x, current_y - 2)) &&
+				if (!(getWorld()->containsObstacle(current_x, current_y, current_x, current_y - 2)) &&
 					!(getWorld()->containsPlayer(current_x, current_y - 2)))
 				{
 					moveTo(current_x, current_y - 2);
@@ -603,7 +602,5 @@ void Vomit::doSomething()
 	}
 	else
 		getWorld()->infecteverything(getX(), getY());
-
-
 }
 
