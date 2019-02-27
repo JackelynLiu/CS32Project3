@@ -132,14 +132,14 @@ void StudentWorld::addintovector(Actor* a)
 	gameObjects.push_back(a);
 }
 
-bool StudentWorld::containsObstacle(double x, double y)
+bool StudentWorld::containsObstacle(double cur_x, double cur_y, double x, double y)
 {
 	vector<Actor*>::iterator it;
 	it = gameObjects.begin();
 
 	while (it != gameObjects.end())
 	{
-		if ((*it)->blocksMovement())
+		if ((*it)->blocksMovement() && !(*it)->isAt(cur_x, cur_y))
 		{
 			double left_x = (*it)->getX();
 			double lower_y = (*it)->getY();
@@ -317,7 +317,6 @@ void StudentWorld::infecteverything(double x, double y)
 	if (determineOverlapwithPlayer(x, y))
 	{
 		m_player->setInfectedStatus(true);
-		cerr << "player infected" << endl;
 	}
 	vector<Actor*>::iterator it;
 	for (it = gameObjects.begin(); it != gameObjects.end(); it++)
@@ -334,6 +333,8 @@ void StudentWorld::infecteverything(double x, double y)
 	}
 }
 
+//write a general find distance function
+
 double StudentWorld::distanceFromPenelope(double x, double y)
 {
 	double dist_x = m_player->getX() - x;
@@ -348,7 +349,7 @@ double StudentWorld::distanceFromNearestZombie(double x, double y)
 	for (int i = 0; i < gameObjects.size(); i++)
 	{
 		double temp_dist = 0;
-		if (gameObjects[i]->defineObjectType() == "ZOMBIE")
+		if (gameObjects[i]->canbeDamaged() && !(gameObjects[i]->canbeInfected()))
 		{
 			double dist_x = gameObjects[i]->getX() - x;
 			double dist_y = gameObjects[i]->getY() - y;
@@ -380,9 +381,6 @@ void StudentWorld::pickupGoodies(double x, double y)
 		if ((*it)->isAt(x, y) && (*it)->isGoodie())
 			(*it)->pickup(m_player);
 	}
-	std::cerr << m_player->getNumVaccines();
-	std::cerr << m_player->getNumFlameCharges();
-	std::cerr << m_player->getNumLandmines();
 }
 
 bool StudentWorld::isLandmineTriggered(double x, double y)
@@ -398,7 +396,6 @@ bool StudentWorld::isLandmineTriggered(double x, double y)
 			if (dist_x*dist_x + dist_y * dist_y <= 100)
 			{
 				return true;
-				cerr << "triggered landmine" << endl;
 			}
 		}
 	}
