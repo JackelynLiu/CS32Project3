@@ -188,6 +188,10 @@ public:
 	virtual void doSomething();
 	virtual std::string defineObjectType() const;
 	virtual bool canbeDamaged() const;
+	void explode();
+
+private:
+	bool m_active;
 };
 
 class Projectile :public StillObjects
