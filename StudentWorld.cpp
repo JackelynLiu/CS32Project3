@@ -375,5 +375,7 @@ void StudentWorld::pickupGoodies(double x, double y)
 		if ((*it)->isAt(x, y) && (*it)->isGoodie())
 			(*it)->pickup(m_player);
 	}
-	cerr << m_player->getNumVaccines();
+	std::cerr << m_player->getNumVaccines();
+	std::cerr << m_player->getNumFlameCharges();
+	std::cerr << m_player->getNumLandmines();
 }
