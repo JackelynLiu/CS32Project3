@@ -36,6 +36,8 @@ bool Actor::isAt(double x, double y)
 	else return false;
 }
 
+bool Actor::canactivateLandmine() const { return false; }
+
 MovingObjects::MovingObjects(StudentWorld* sw, int imageID, double x, double y)
 	:Actor(sw, imageID, x, y, right, 0)
 {}
@@ -43,6 +45,8 @@ MovingObjects::MovingObjects(StudentWorld* sw, int imageID, double x, double y)
 bool MovingObjects::blocksMovement() const { return true; }
 
 bool MovingObjects::canbeDamaged() const { return true; }
+
+bool MovingObjects::canactivateLandmine() const { return true; }
 
 Person::Person(StudentWorld* sw, int imageID, double x, double y)
 	:MovingObjects(sw, imageID, x, y), m_infectioncount(0)
@@ -108,6 +112,7 @@ void Penelope::doSomething()
 			break;
 		case KEY_PRESS_SPACE:
 		{
+			getWorld()->addintovector(new Vomit(getWorld(), getX() - SPRITE_WIDTH, getY(), right));
 			if (num_flamecharges == 0)
 				break;
 			else num_flamecharges--;
@@ -522,18 +527,16 @@ Landmine::Landmine(StudentWorld* sw, double x, double y)
 
 void Landmine::doSomething()
 {
+	increasetickcount();
 	if (!getStatus()) return;
 	if (gettickcount() == 30)
 	{
-		m_active == true;
+		m_active = true;
 	}
 	if (m_active)
-		if (getWorld()->determineOverlapwithPlayer(getX(), getY()))
+		if (getWorld()->isLandmineTriggered(getX(), getY()))
 			explode();
-	increasetickcount();
 }
-
-bool Landmine::canbeDamaged() const { return true; }
 
 void Landmine::explode()
 {
@@ -577,6 +580,8 @@ void Flame::doSomething()
 }
 
 std::string Flame::defineObjectType() const { return "FLAME"; }
+
+bool Flame::canactivateLandmine() const { return true; }
 
 Vomit::Vomit(StudentWorld* sw, double x, double y, int dir)
 	: Projectile(sw, IID_VOMIT, x, y, dir)
