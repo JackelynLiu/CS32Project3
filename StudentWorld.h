@@ -42,6 +42,8 @@ public:
 
 	void pickupGoodies(double x, double y);
 
+	bool isZombieVomitTriggerAt(double x, double y);
+
 	//void recordCitizenGone();
 	//void recordLevelFinishedIfAllCitizensGone();
 	//bool isMovingObjectBlockedAt(double x, double y) const;
