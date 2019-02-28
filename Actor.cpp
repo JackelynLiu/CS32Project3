@@ -25,7 +25,13 @@ bool Actor::blocksFlame() const { return false; }
 
 void Actor::useExitIfAppropriate() {}
 
-bool Actor::isGoodie() const { return false; }
+void Actor::activateifAppropriate(Actor* a) {}
+
+bool Actor::canbePickedUp() const { return false; }
+
+bool Actor::triggersCitizens() const { return false; }
+
+bool Actor::threatensCitizens() const { return false; }
 
 bool Actor::isAt(double x, double y)
 {
@@ -52,8 +58,6 @@ Person::Person(StudentWorld* sw, int imageID, double x, double y)
 
 void Person::doSomething()
 {
-	if (!getStatus())
-		return;
 	if (m_infectedstatus)
 		m_infectioncount++;
 }
@@ -80,8 +84,12 @@ void Penelope::useExitIfAppropriate()
 	}
 }
 
+bool Penelope::triggersCitizens() const { return true; }
+
 void Penelope::doSomething()
 {
+	if (!getStatus())
+		return;
 	Person::doSomething();
 	if (getInfectionCount() == 500)
 	{
@@ -229,6 +237,8 @@ void Citizen::changeStatus()
 
 void Citizen::doSomething()
 {
+	if (!getStatus())
+		return;
 	increasetickcount();
 	Person::doSomething();		//increases m_infectioncount here
 	double current_x = getX();
@@ -244,214 +254,159 @@ void Citizen::doSomething()
 			new_Zombie = new DumbZombie(getWorld(), current_x, current_y);
 		else new_Zombie = new SmartZombie(getWorld(), current_x, current_y);
 		getWorld()->addintovector(new_Zombie);
+		getWorld()->recordCitizenGone();
 		return;
 	}
 	if (gettickcount() % 2 == 0)
 		return;
 
-	double dist_p = getWorld()->distanceFromPenelope(current_x, current_y);
-	double dist_z = getWorld()->distanceFromNearestZombie(current_x, current_y);
-
-	double px = getWorld()->getPenelopexcoord();
-	double py = getWorld()->getPenelopeycoord();
-
-	if (dist_p <= dist_z && dist_p <= 80)
+	double trigger_x, trigger_y, trigger_dist = 0;
+	bool threat = false;
+	if (getWorld()->locateNearestCitizenTrigger(getX(), getY(), trigger_x, trigger_y, trigger_dist, threat))
 	{
-		if (current_y == py)			//if Penelope is in the same row
+		if (threat)
 		{
-			if (px <= current_x)		//if Penelope is on the left
+			map<double, Direction> dist2dir;
+			double distR, distL, distU, distD;
+			double dist_max = trigger_dist;
+			Direction dir_max = right;
+
+			if (!getWorld()->containsObstacle(current_x, current_y, current_x + 2, current_y))
 			{
-				setDirection(left);
-				if (!(getWorld()->containsObstacle(current_x, current_y, current_x - 2, current_y)) &&
-					!(getWorld()->containsPlayer(current_x-2, current_y)))
-				{
-					moveTo(current_x - 2, current_y);
-					return;
-				}
+				distR = getWorld()->distanceFromNearestZombie(current_x + 2, current_y);
+				dist2dir[distR] = right;
 			}
-			else if (px >= current_x)
+			if (!getWorld()->containsObstacle(current_x, current_y, current_x - 2, current_y))
 			{
-				setDirection(right);
-				if (!(getWorld()->containsObstacle(current_x, current_y, current_x + 2, current_y)) &&
-					!(getWorld()->containsPlayer(current_x + 2, current_y)))
-				{
-					moveTo(current_x + 2, current_y);
-					return;
-				}
+				distL = getWorld()->distanceFromNearestZombie(current_x - 2, current_y);
+				dist2dir[distL] = left;
 			}
-		}
-		else if (current_x == px)		//if Penelope is in the same column
-		{
-			if (py <= current_y)		//if Penelope is below
+			if (!getWorld()->containsObstacle(current_x, current_y, current_x, current_y + 2))
 			{
-				setDirection(down);
-				if (!(getWorld()->containsObstacle(current_x, current_y, current_x, current_y - 2)) &&
-					!(getWorld()->containsPlayer(current_x, current_y-2)))
-				{
-					moveTo(current_x, current_y - 2);
-					return;
-				}
+				distU = getWorld()->distanceFromNearestZombie(current_x, current_y + 2);
+				dist2dir[distU] = up;
 			}
-			else if (py >= current_y)
+			if (!getWorld()->containsObstacle(current_x, current_y, current_x, current_y - 2))
 			{
-				setDirection(up);
-				if (!(getWorld()->containsObstacle(current_x, current_y, current_x, current_y + 2)) &&
-					!(getWorld()->containsPlayer(current_x, current_y + 2)))
-				{
-					moveTo(current_x, current_y + 2);
-					return;
-				}
+				distD = getWorld()->distanceFromNearestZombie(current_x, current_y - 2);
+				dist2dir[distD] = down;
 			}
-		}
-		else
-		{
-			Direction h = right;
-			Direction v = up;
-			Direction f = v;
-			if (px <= current_x)
-				h = left;
-			if (py <= current_y)
-				v = down;
-			int choose = randInt(1, 2);
-			if (choose == 1)
-				f = h;
-			else f = v;
-			setDirection(f);
-			switch (f)
+
+			//map is in ascending order so last one is max
+			map<double, Direction>::iterator it;
+			it = dist2dir.end();
+			if (dist2dir.size() > 0)
+				it--;			//i cant decrement it???
+
+			dist_max = it->first;
+			if (dist_max >= trigger_dist)
+				dir_max = it->second;
+			else return;
+
+			setDirection(dir_max);
+			switch (dir_max)
 			{
 			case right:
-				if (!(getWorld()->containsObstacle(current_x, current_y, current_x + 2, current_y)) &&
-					!(getWorld()->containsPlayer(current_x + 2, current_y)))
-				{
-					moveTo(current_x + 2, current_y);
-					return;
-				}
-			case left:
-				if (!(getWorld()->containsObstacle(current_x, current_y, current_x - 2, current_y)) &&
-					!(getWorld()->containsPlayer(current_x - 2, current_y)))
-				{
-					moveTo(current_x - 2, current_y);
-					return;
-				}
-			case up:
-				if (!(getWorld()->containsObstacle(current_x, current_y, current_x, current_y + 2)) &&
-					!(getWorld()->containsPlayer(current_x, current_y + 2)))
-				{
-					moveTo(current_x, current_y + 2);
-					return;
-				}
-			case down:
-				if (!(getWorld()->containsObstacle(current_x, current_y, current_x, current_y - 2)) &&
-					!(getWorld()->containsPlayer(current_x, current_y - 2)))
-				{
-					moveTo(current_x, current_y - 2);
-					return;
-				}
-			default:
+			{
+				moveTo(current_x + 2, current_y);
 				break;
 			}
-			Direction f2 = f;
-			if (f == up || f == down)
-				f2 = h;
-			//else f2 = v;
-			setDirection(f2);
-			switch (f2)
+			case left:
+			{
+				moveTo(current_x - 2, current_y);
+				break;
+			}
+			case up:
+			{
+				moveTo(current_x, current_y + 2);
+				break;
+			}
+			case down:
+			{
+				moveTo(current_x, current_y - 2);
+				break;
+			}
+
+			}
+		
+		}
+
+		if (!threat)
+		{
+			if (trigger_x == current_x)		//if chosen trigger is in same column
+			{
+				if (trigger_y > current_y)		//if trigger is above
+					setDirection(up);
+				else setDirection(down);
+			}
+			else if (trigger_y == current_y)		//if chosen trigger is in same row
+			{
+				if (trigger_x > current_x)		//if trigger is to the right
+					setDirection(right);
+				else setDirection(left);
+			}
+			else
+			{
+				int r = randInt(1, 2);
+				if (trigger_x < getX() && trigger_y < getY())
+				{
+					if (r == 1)
+						setDirection(left);
+					else setDirection(down);
+				}
+				else if (trigger_x < getX() && trigger_y > getY())
+				{
+					if (r == 1)
+						setDirection(left);
+					else setDirection(up);
+				}
+				else if (trigger_x > getX() && trigger_y < getY())
+				{
+					if (r == 1)
+						setDirection(right);
+					else setDirection(down);
+				}
+				else if (trigger_x > getX() && trigger_y > getY())
+				{
+					if (r == 1)
+						setDirection(right);
+					else setDirection(up);
+				}
+
+			}
+
+			switch (getDirection())
 			{
 			case right:
-				if (!(getWorld()->containsObstacle(current_x, current_y, current_x + 2, current_y)) &&
-					!(getWorld()->containsPlayer(current_x + 2, current_y)))
-				{
+			{
+				if (!getWorld()->containsObstacle(current_x, current_y, current_x + 2, current_y) &&
+					!getWorld()->containsPlayer(current_x + 2, current_y))
 					moveTo(current_x + 2, current_y);
-					return;
-				}
-			case left:
-				if (!(getWorld()->containsObstacle(current_x, current_y, current_x - 2, current_y)) &&
-					!(getWorld()->containsPlayer(current_x - 2, current_y)))
-				{
-					moveTo(current_x - 2, current_y);
-					return;
-				}
-			case up:
-				if (!(getWorld()->containsObstacle(current_x, current_y, current_x, current_y + 2)) &&
-					!(getWorld()->containsPlayer(current_x, current_y + 2)))
-				{
-					moveTo(current_x, current_y + 2);
-					return;
-				}
-			case down:
-				if (!(getWorld()->containsObstacle(current_x, current_y, current_x, current_y - 2)) &&
-					!(getWorld()->containsPlayer(current_x, current_y - 2)))
-				{
-					moveTo(current_x, current_y - 2);
-					return;
-				}
-			default:
 				break;
 			}
-		}
-	}
-	else if (dist_z <= 80)
-	{
-		map<double, Direction> dist2dir;
-		double distR, distL, distU, distD;
-		double dist_max = dist_z;
-		Direction dir_max = right;
+			case left:
+			{
+				if (!getWorld()->containsObstacle(current_x, current_y, current_x - 2, current_y) &&
+					!getWorld()->containsPlayer(current_x - 2, current_y))
+					moveTo(current_x - 2, current_y);
+				break;
+			}
+			case up:
+			{
+				if (!getWorld()->containsObstacle(current_x, current_y, current_x, current_y + 2) &&
+					!getWorld()->containsPlayer(current_x, current_y + 2))
+					moveTo(current_x, current_y + 2);
+				break;
+			}
+			case down:
+			{
+				if (!getWorld()->containsObstacle(current_x, current_y, current_x, current_y - 2) &&
+					!getWorld()->containsPlayer(current_x, current_y - 2))
+					moveTo(current_x, current_y - 2);
+				break;
+			}
 
-		if (!getWorld()->containsObstacle(current_x, current_y, current_x + 2, current_y))
-		{
-			distR = getWorld()->distanceFromNearestZombie(current_x + 2, current_y);
-			dist2dir[distR] = right;
-		}
-		if (!getWorld()->containsObstacle(current_x, current_y, current_x - 2, current_y))
-		{
-			distL = getWorld()->distanceFromNearestZombie(current_x - 2, current_y);
-			dist2dir[distL] = left;
-		}
-		if (!getWorld()->containsObstacle(current_x, current_y, current_x, current_y + 2))
-		{
-			distU = getWorld()->distanceFromNearestZombie(current_x, current_y + 2);
-			dist2dir[distU] = up;
-		}
-		if (!getWorld()->containsObstacle(current_x, current_y, current_x, current_y - 2))
-		{
-			distD = getWorld()->distanceFromNearestZombie(current_x, current_y - 2);
-			dist2dir[distD] = down;
-		}
-
-		//map is in ascending order so last one is max
-		map<double, Direction>::iterator it;
-		it = dist2dir.end();
-		it--;
-
-		dist_max = it->first;
-		if (dist_max >= dist_z)
-			dir_max = it->second;
-		else return;
-
-		setDirection(dir_max);
-		switch (dir_max)
-		{
-		case right:
-		{
-			moveTo(current_x + 2, current_y);
-			break;
-		}
-		case left:
-		{
-			moveTo(current_x - 2, current_y);
-			break;
-		}
-		case up:
-		{
-			moveTo(current_x, current_y + 2);
-			break;
-		}
-		case down:
-		{
-			moveTo(current_x, current_y - 2);
-			break;
-		}
-
+			}
 		}
 	}
 	else return;
@@ -466,6 +421,9 @@ void Zombie::changeStatus()
 	Actor::changeStatus();
 	getWorld()->playSound(SOUND_ZOMBIE_DIE);
 }
+
+bool Zombie::triggersCitizens() const { return true; }
+bool Zombie::threatensCitizens() const { return true; }
 
 void Zombie::doSomething()
 {
@@ -623,12 +581,7 @@ void SmartZombie::doSomething()
 	Zombie::doSomething();
 	
 	double hx, hy, h_dist = 0;
-	getWorld()->locateNearestVomitTrigger(getX(), getY(), hx, hy, h_dist);
-	if (h_dist > 80)
-	{
-		setRandomDirection();
-	}
-	else
+	if (getWorld()->locateNearestVomitTrigger(getX(), getY(), hx, hy, h_dist))
 	{
 		if (hx == getX())		//chosen human is in same column as zombie
 		{
@@ -672,6 +625,7 @@ void SmartZombie::doSomething()
 
 		}
 	}
+	else setRandomDirection();
 	moveinDirection();
 	
 }
@@ -764,7 +718,7 @@ void Goodie::doSomething()
 
 bool Goodie::canbeDamaged() const { return true; }
 
-bool Goodie::isGoodie() const { return true; }
+bool Goodie::canbePickedUp() const { return true; }
 
 VaccineGoodie::VaccineGoodie(StudentWorld* sw, double x, double y)
 	: Goodie(sw, IID_VACCINE_GOODIE, x, y)
