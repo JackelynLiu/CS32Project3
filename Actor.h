@@ -30,7 +30,7 @@ public:
 
 	//make more general function
 	virtual bool canactivateLandmine() const;
-	virtual bool canExit() const;
+	virtual void useExitIfAppropriate();
 
 	StudentWorld* getWorld() { return current_world; }
 
@@ -58,7 +58,6 @@ public:
 	virtual bool canbeInfected() const;
 	int getInfectionCount() const;
 	void setInfectionCount(int n);
-	virtual bool canExit() const;
 
 	bool getInfectedStatus() const;
 	void setInfectedStatus(bool infected);
@@ -73,8 +72,8 @@ class Penelope : public Person
 public:
 	Penelope(StudentWorld* sw, double x, double y);
 	virtual void doSomething();
-	/*virtual void useExitIfAppropriate();
-	virtual void dieByFallOrBurnIfAppropriate();
+	virtual void useExitIfAppropriate();
+	/*virtual void dieByFallOrBurnIfAppropriate();
 	virtual void pickUpGoodieIfAppropriate(Goodie* g);*/
 
 	void increaseVaccines();
@@ -104,8 +103,12 @@ class Zombie :public MovingObjects
 public:
 	Zombie(StudentWorld* sw, double x, double y);
 	virtual void doSomething();
-	int getmovementPlan() const;
-	void setmovementPlan(int num);
+	virtual void changeStatus();
+
+protected:
+	void setRandomDirection();
+	void moveinDirection();
+
 private:
 	int movement_plan;
 };
