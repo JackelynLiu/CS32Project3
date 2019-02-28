@@ -13,27 +13,31 @@ public:
 	virtual void doSomething() = 0;
 	virtual bool blocksMovement() const = 0;
 	virtual bool canbeDamaged() const;
-	virtual bool canbeInfected() const;
-	virtual bool blocksFlame() const;
-	virtual bool canExit() const;
+	virtual bool canbeInfected() const;		//PENELOPE, CITIZEN
+	virtual bool blocksFlame() const;		//WALL, EXIT
+	
 	bool getStatus() const;
-	void setStatus(bool new_status);
-	bool getInfectedStatus() const;
-	void setInfectedStatus(bool infected);
+	virtual void changeStatus();
 	int gettickcount() const;
 	void increasetickcount();
-	virtual std::string defineObjectType() const = 0;
-	virtual bool isGoodie() const;
+
 	virtual void pickup(Penelope* p) {}
+
+	//try to replace
+	virtual bool isGoodie() const;
+	
 	bool isAt(double x, double y);
+
+	//make more general function
 	virtual bool canactivateLandmine() const;
+	virtual bool canExit() const;
+
 	StudentWorld* getWorld() { return current_world; }
 
 private:
 	StudentWorld* current_world;
 	bool m_status;
 	int m_tickcount;
-	bool m_infectedstatus;
 };
 
 class MovingObjects :public Actor
@@ -54,11 +58,14 @@ public:
 	virtual bool canbeInfected() const;
 	int getInfectionCount() const;
 	void setInfectionCount(int n);
-	virtual std::string defineObjectType() const;
 	virtual bool canExit() const;
+
+	bool getInfectedStatus() const;
+	void setInfectedStatus(bool infected);
 
 private:
 	int m_infectioncount;
+	bool m_infectedstatus;
 };
 
 class Penelope : public Person
@@ -88,6 +95,7 @@ class Citizen :public Person
 public:
 	Citizen(StudentWorld* sw, double x, double y);
 	virtual void doSomething();
+	virtual void changeStatus();
 
 };
 
@@ -95,8 +103,11 @@ class Zombie :public MovingObjects
 {
 public:
 	Zombie(StudentWorld* sw, double x, double y);
-	virtual void doSomething() = 0;
-	virtual std::string defineObjectType() const;
+	virtual void doSomething();
+	int getmovementPlan() const;
+	void setmovementPlan(int num);
+private:
+	int movement_plan;
 };
 
 class SmartZombie :public Zombie
@@ -104,6 +115,7 @@ class SmartZombie :public Zombie
 public:
 	SmartZombie(StudentWorld* sw, double x, double y);
 	virtual void doSomething();
+	virtual void changeStatus();
 };
 
 class DumbZombie : public Zombie
@@ -111,6 +123,7 @@ class DumbZombie : public Zombie
 public:
 	DumbZombie(StudentWorld* sw, double x, double y);
 	virtual void doSomething();
+	virtual void changeStatus();
 };
 
 class Wall :public Actor
@@ -119,7 +132,6 @@ public:
 	Wall(StudentWorld* sw, double x, double y);
 	virtual void doSomething();
 	virtual bool blocksMovement() const;
-	virtual std::string defineObjectType() const;
 	virtual bool blocksFlame() const;
 };
 
@@ -136,7 +148,6 @@ class Exit :public StillObjects
 public:
 	Exit(StudentWorld* sw, double x, double y);
 	virtual void doSomething();
-	virtual std::string defineObjectType() const;
 	virtual bool blocksFlame() const;
 };
 
@@ -145,7 +156,6 @@ class Pit :public StillObjects
 public:
 	Pit(StudentWorld* sw, double x, double y);
 	virtual void doSomething();
-	virtual std::string defineObjectType() const;
 };
 
 class Goodie :public StillObjects
@@ -153,7 +163,6 @@ class Goodie :public StillObjects
 public:
 	Goodie(StudentWorld* sw, int imageID, double x, double y);
 	virtual void doSomething();
-	virtual std::string defineObjectType() const;
 	virtual bool canbeDamaged() const;
 	virtual void pickup(Penelope* p) = 0;
 	virtual bool isGoodie() const;
@@ -188,7 +197,6 @@ class Landmine :public StillObjects
 public:
 	Landmine(StudentWorld* sw, double x, double y);
 	virtual void doSomething();
-	virtual std::string defineObjectType() const;
 	void explode();
 
 private:
@@ -207,7 +215,6 @@ class Flame :public Projectile
 public:
 	Flame(StudentWorld* sw, double x, double y, int dir);
 	virtual void doSomething();
-	virtual std::string defineObjectType() const;
 	virtual bool canactivateLandmine() const;
 };
 
@@ -216,7 +223,6 @@ class Vomit :public Projectile
 public:
 	Vomit(StudentWorld* sw, double x, double y, int dir);
 	virtual void doSomething();
-	virtual std::string defineObjectType() const;
 };
 
 #endif // ACTOR_H_
