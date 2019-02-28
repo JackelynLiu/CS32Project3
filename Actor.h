@@ -15,6 +15,9 @@ public:
 	virtual bool canbeDamaged() const;
 	virtual bool canbeInfected() const;		//PENELOPE, CITIZEN
 	virtual bool blocksFlame() const;		//WALL, EXIT
+	virtual bool triggersCitizens() const;
+	virtual bool threatensCitizens() const;
+
 	
 	bool getStatus() const;
 	virtual void changeStatus();
@@ -23,14 +26,17 @@ public:
 
 	virtual void pickup(Penelope* p) {}
 
+	virtual void activateifAppropriate(Actor* a);
+
 	//try to replace
-	virtual bool isGoodie() const;
+	virtual bool canbePickedUp() const;
 	
 	bool isAt(double x, double y);
 
 	//make more general function
 	virtual bool canactivateLandmine() const;
 	virtual void useExitIfAppropriate();
+
 
 	StudentWorld* getWorld() { return current_world; }
 
@@ -73,6 +79,7 @@ public:
 	Penelope(StudentWorld* sw, double x, double y);
 	virtual void doSomething();
 	virtual void useExitIfAppropriate();
+	virtual bool triggersCitizens() const;
 	/*virtual void dieByFallOrBurnIfAppropriate();
 	virtual void pickUpGoodieIfAppropriate(Goodie* g);*/
 
@@ -104,6 +111,8 @@ public:
 	Zombie(StudentWorld* sw, double x, double y);
 	virtual void doSomething();
 	virtual void changeStatus();
+	virtual bool triggersCitizens() const;
+	virtual bool threatensCitizens() const;
 
 protected:
 	void setRandomDirection();
@@ -152,6 +161,7 @@ public:
 	Exit(StudentWorld* sw, double x, double y);
 	virtual void doSomething();
 	virtual bool blocksFlame() const;
+	//virtual void activateifAppropriate(Actor* a);
 };
 
 class Pit :public StillObjects
@@ -168,7 +178,7 @@ public:
 	virtual void doSomething();
 	virtual bool canbeDamaged() const;
 	virtual void pickup(Penelope* p) = 0;
-	virtual bool isGoodie() const;
+	virtual bool canbePickedUp() const;
 };
 
 class VaccineGoodie :public Goodie
