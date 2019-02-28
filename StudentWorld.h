@@ -30,9 +30,11 @@ public:
 	void getKilledbyFlameorPit(double x, double y);
 	bool containsObstacleforFlame(double x, double y);
 	void infecteverything(double x, double y);
-	double distanceFromPenelope(double x, double y);
+	double distanceFromPenelope(double x, double y) const;
 	double distanceFromNearestZombie(double x, double y);
 	bool locateNearestVomitTrigger(double x, double y, double& otherX, double& otherY, double& distance);
+	bool locateNearestCitizenTrigger(double x, double y, double& otherX, double& otherY, double& distance, bool& isThreat) const;
+	bool locateNearestCitizenThreat(double x, double y, double& otherX, double& otherY, double& distance) const;
 	double getPenelopexcoord() const; //stop using
 	double getPenelopeycoord() const; //stop using
 	//int whattofollow(double x, double y);
@@ -43,7 +45,7 @@ public:
 
 	bool isZombieVomitTriggerAt(double x, double y);
 
-	//void recordCitizenGone();
+	void recordCitizenGone();
 	//void recordLevelFinishedIfAllCitizensGone();
 	//bool isMovingObjectBlockedAt(double x, double y) const;
 
