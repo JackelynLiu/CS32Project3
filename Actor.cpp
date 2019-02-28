@@ -23,7 +23,7 @@ bool Actor::canbeInfected() const { return false; }
 
 bool Actor::blocksFlame() const { return false; }
 
-bool Actor::canExit() const { return false; }
+void Actor::useExitIfAppropriate() {}
 
 bool Actor::isGoodie() const { return false; }
 
@@ -64,8 +64,6 @@ int Person::getInfectionCount() const { return m_infectioncount; }
 
 void Person::setInfectionCount(int n) { m_infectioncount = n; }
 
-bool Person::canExit() const { return true; }
-
 bool Person::getInfectedStatus() const { return m_infectedstatus; }
 
 void Person::setInfectedStatus(bool infected) { m_infectedstatus = infected; }
@@ -73,6 +71,14 @@ void Person::setInfectedStatus(bool infected) { m_infectedstatus = infected; }
 Penelope::Penelope(StudentWorld* sw, double x, double y)
 	:Person(sw, IID_PLAYER, x, y), num_vaccines(0), num_landmines(0), num_flamecharges(0)
 {}
+
+void Penelope::useExitIfAppropriate()
+{
+	if (getWorld()->getNumCitizensLeft() == 0)
+	{
+		//getWorld()->completedLevel();
+	}
+}
 
 void Penelope::doSomething()
 {
@@ -455,11 +461,14 @@ Zombie::Zombie(StudentWorld* sw, double x, double y)
 	:MovingObjects(sw, IID_ZOMBIE, x, y), movement_plan(0)
 {}
 
+void Zombie::changeStatus()
+{
+	Actor::changeStatus();
+	getWorld()->playSound(SOUND_ZOMBIE_DIE);
+}
+
 void Zombie::doSomething()
 {
-	increasetickcount();
-	if (!getStatus()) return;
-	if (gettickcount() % 2 == 0) return;
 	double vomit_x = 0;
 	double vomit_y = 0;
 	int r = randInt(1, 3);
@@ -522,10 +531,79 @@ void Zombie::doSomething()
 		break;
 	}
 	}
+
+	if (movement_plan == 0)
+	{
+		int r = randInt(3, 10);
+		movement_plan = r;
+	}
+
 }
 
-int Zombie::getmovementPlan() const { return movement_plan; }
-void Zombie::setmovementPlan(int num) { movement_plan = num; }
+void Zombie::setRandomDirection()
+{
+	int r = randInt(1, 4);
+	switch (r)
+	{
+	case 1:
+	{
+		setDirection(right);
+		break;
+	}
+	case 2:
+	{
+		setDirection(left);
+		break;
+	}
+	case 3:
+	{
+		setDirection(up);
+		break;
+	}
+	case 4:
+	{
+		setDirection(down);
+		break;
+	}
+	default:
+		break;
+	}
+}
+
+void Zombie::moveinDirection()
+{
+	double dest_x = getX();
+	double dest_y = getY();
+	switch (getDirection())
+	{
+	case right:
+	{
+		dest_x++;
+		break;
+	}
+	case left:
+	{
+		dest_x--;
+		break;
+	}
+	case up:
+	{
+		dest_y++;
+		break;
+	}
+	case down:
+	{
+		dest_y--;
+		break;
+	}
+	}
+	if (!getWorld()->containsObstacle(getX(), getY(), dest_x, dest_y) && !getWorld()->containsPlayer(dest_x, dest_y))
+	{
+		moveTo(dest_x, dest_y);
+		movement_plan--;
+	}
+	else movement_plan = 0;
+}
 
 SmartZombie::SmartZombie(StudentWorld* sw, double x, double y)
 	:Zombie(sw, x, y)
@@ -533,15 +611,69 @@ SmartZombie::SmartZombie(StudentWorld* sw, double x, double y)
 
 void SmartZombie::changeStatus()
 {
-	Actor::changeStatus();
+	Zombie::changeStatus();
 	getWorld()->increaseScore(2000);
 }
 
 void SmartZombie::doSomething()
 {
+	increasetickcount();
+	if (!getStatus()) return;
+	if (gettickcount() % 2 == 0) return;
 	Zombie::doSomething();
+	
+	double hx, hy, h_dist = 0;
+	getWorld()->locateNearestVomitTrigger(getX(), getY(), hx, hy, h_dist);
+	if (h_dist > 80)
+	{
+		setRandomDirection();
+	}
+	else
+	{
+		if (hx == getX())		//chosen human is in same column as zombie
+		{
+			if (hy < getY())	//chosen human is lower than zombie
+				setDirection(down);
+			else setDirection(up);
+		}
+		else if (hy == getY())		//chosen human is in same row as zombie
+		{
+			if (hx < getX())	//chosen human is on the left of zombie
+				setDirection(left);
+			else setDirection(up);
+		}
+		else
+		{
+			int r = randInt(1, 2);
+			if (hx < getX() && hy < getY())
+			{
+				if (r == 1)
+					setDirection(left);
+				else setDirection(down);
+			}
+			else if (hx < getX() && hy > getY())
+			{
+				if (r == 1)
+					setDirection(left);
+				else setDirection(up);
+			}
+			else if (hx > getX() && hy < getY())
+			{
+				if (r == 1)
+					setDirection(right);
+				else setDirection(down);
+			}
+			else if (hx > getX() && hy > getY())
+			{
+				if (r == 1)
+					setDirection(right);
+				else setDirection(up);
+			}
 
-
+		}
+	}
+	moveinDirection();
+	
 }
 
 DumbZombie::DumbZombie(StudentWorld* sw, double x, double y)
@@ -550,60 +682,18 @@ DumbZombie::DumbZombie(StudentWorld* sw, double x, double y)
 
 void DumbZombie::changeStatus()
 {
-	Actor::changeStatus();
+	Zombie::changeStatus();
 	getWorld()->increaseScore(1000);
 }
 
 void DumbZombie::doSomething()	//carrying vaccine -- remember to implement
 {
+	increasetickcount();
+	if (!getStatus()) return;
+	if (gettickcount() % 2 == 0) return;
 	Zombie::doSomething();
-	
-	if (getmovementPlan() == 0)
-	{
-		int r = randInt(3, 10);
-		setmovementPlan(r);
-		int d = randInt(1, 4);
-		switch (d)
-		{
-		case 1:
-			setDirection(right);
-			break;
-		case 2:
-			setDirection(left);
-			break;
-		case 3:
-			setDirection(down);
-			break;
-		case 4:
-			setDirection(up);
-			break;
-		}
-		setmovementPlan(r);
-	}
-
-	double dest_x = getX();
-	double dest_y = getY();
-	switch (getDirection())
-	{
-	case right:
-		dest_x++;
-		break;
-	case left:
-		dest_x--;
-		break;
-	case up:
-		dest_y++;
-		break;
-	case down:
-		dest_y--;
-		break;
-	}
-	if (!getWorld()->containsObstacle(getX(), getY(), dest_x, dest_y) && !getWorld()->containsPlayer(dest_x, dest_y))
-	{
-		moveTo(dest_x, dest_y);
-		setmovementPlan(getmovementPlan() - 1);
-	}
-	else setmovementPlan(0);
+	setRandomDirection();
+	moveinDirection();
 }
 
 Wall::Wall(StudentWorld* sw, double x, double y)
