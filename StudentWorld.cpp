@@ -5,6 +5,7 @@
 #include <string>
 #include <iostream>
 #include <sstream>
+#include <iomanip>
 using namespace std;
 
 GameWorld* createStudentWorld(string assetPath)
@@ -107,7 +108,20 @@ int StudentWorld::move()
 		else it++;
 	}
 	ostringstream oss;
-	oss << "Score: " << getScore() << "  Level: " << getLevel() << "  Lives: " << getLives() << "  Vaccines: " << m_player->getNumVaccines() <<
+	oss << "Score: ";
+	if (getScore() >= 0)
+	{
+		oss.fill('0');
+		oss << setw(6) << getScore();
+	}
+	else
+	{
+		oss << "-";
+		oss.fill('0');
+		oss << setw(5) << -getScore();
+	}
+	
+	oss << "  Level: " << getLevel() << "  Lives: " << getLives() << "  Vaccines: " << m_player->getNumVaccines() <<
 		"  Flames: " << m_player->getNumFlameCharges() << "  Mines: " << m_player->getNumLandmines() << "  Infected: " << m_player->getInfectionCount();
 	string currentstats = oss.str();
 	setGameStatText(currentstats);
