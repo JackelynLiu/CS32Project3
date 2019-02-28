@@ -25,18 +25,17 @@ public:
 	bool containsPlayer(double x, double y);
 	bool determineOverlapwithPlayer(double x, double y);
 	bool determineOverlapwithCitizen(double x, double y);
-	//bool determineOverlapwithZombie(double x, double y);
 	void setPenelopetoDead();
-	//void setOverlappedZombietoDead(double x, double y);
 	int getNumCitizensLeft() const;
 	void getKilledbyFlameorPit(double x, double y);
 	bool containsObstacleforFlame(double x, double y);
 	void infecteverything(double x, double y);
 	double distanceFromPenelope(double x, double y);
 	double distanceFromNearestZombie(double x, double y);
+	bool locateNearestVomitTrigger(double x, double y, double& otherX, double& otherY, double& distance);
 	double getPenelopexcoord() const; //stop using
 	double getPenelopeycoord() const; //stop using
-	int whattofollow(double x, double y);
+	//int whattofollow(double x, double y);
 	//Direction whichdirectionshouldCitizengo(double x, double y);
 	bool isLandmineTriggered(double x, double y);
 
