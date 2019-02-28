@@ -27,10 +27,10 @@ int StudentWorld::init()
 {
 	num_alivecitizens = 0;
 	Level lev(assetPath());
-	string levelFile = "level04.txt";
+	string levelFile = "level01.txt";
 	Level::LoadResult result = lev.loadLevel(levelFile);
 	if (result == Level::load_fail_file_not_found)
-		cerr << "Cannot find level04.txt data file" << endl;
+		cerr << "Cannot find level01.txt data file" << endl;
 	else if (result == Level::load_fail_bad_format)
 		cerr << "Your level was improperly formatted" << endl;
 	else if (result == Level::load_success)
@@ -308,7 +308,7 @@ void StudentWorld::infecteverything(double x, double y)
 
 //write a general find distance function
 
-double StudentWorld::distanceFromPenelope(double x, double y)
+double StudentWorld::distanceFromPenelope(double x, double y) const
 {
 	double dist_x = m_player->getX() - x;
 	double dist_y = m_player->getY() - y;
@@ -351,7 +351,7 @@ void StudentWorld::pickupGoodies(double x, double y)
 	vector<Actor*>::iterator it;
 	for (it = gameObjects.begin(); it != gameObjects.end(); it++)
 	{
-		if ((*it)->isAt(x, y) && (*it)->isGoodie())
+		if ((*it)->isAt(x, y) && (*it)->canbePickedUp())
 			(*it)->pickup(m_player);
 	}
 }
@@ -420,4 +420,67 @@ bool StudentWorld::locateNearestVomitTrigger(double x, double y, double& otherX,
 
 	if (distance <= 80) return true;
 	else return false;
+}
+
+bool StudentWorld::locateNearestCitizenTrigger(double x, double y, double& otherX, double& otherY, double& distance, bool& isThreat) const
+{
+	double dist_p = distanceFromPenelope(x, y);
+	double tx, ty, t_dist = 0;
+	if (locateNearestCitizenThreat(x, y, tx, ty, t_dist))
+	{
+		if (dist_p > t_dist)
+		{
+			isThreat = true;
+			otherX = tx;
+			otherY = ty;
+			distance = t_dist;
+			return true;
+		}
+		else
+		{
+			distance = dist_p;
+			otherX = m_player->getX();
+			otherY = m_player->getY();
+		}
+
+	}
+	else
+	{
+		distance = dist_p;
+		otherX = m_player->getX();
+		otherY = m_player->getY();
+	}
+
+	if (distance <= 80) return true;
+	else return false;
+
+}
+
+bool StudentWorld::locateNearestCitizenThreat(double x, double y, double& otherX, double& otherY, double& distance) const
+{
+	double dist_z = 400000000;
+	for (int i = 0; i < gameObjects.size(); i++)
+	{
+		if (gameObjects[i]->threatensCitizens())
+		{
+			double dist_x = gameObjects[i]->getX() - x;
+			double dist_y = gameObjects[i]->getY() - y;
+			double temp_dist = sqrt((dist_x*dist_x) + (dist_y * dist_y));
+			if (temp_dist < dist_z)
+			{
+				dist_z = temp_dist;
+				otherX = gameObjects[i]->getX();
+				otherY = gameObjects[i]->getY();
+			}
+		}
+	}
+	distance = dist_z;
+	if (distance <= 80)
+		return true;
+	else return false;
+}
+
+void StudentWorld::recordCitizenGone()
+{
+	num_alivecitizens--;
 }
