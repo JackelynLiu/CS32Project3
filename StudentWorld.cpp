@@ -26,10 +26,10 @@ int StudentWorld::init()
 {
 	num_alivecitizens = 0;
 	Level lev(assetPath());
-	string levelFile = "level04.txt";
+	string levelFile = "level01.txt";
 	Level::LoadResult result = lev.loadLevel(levelFile);
 	if (result == Level::load_fail_file_not_found)
-		cerr << "Cannot find level04.txt data file" << endl;
+		cerr << "Cannot find level01.txt data file" << endl;
 	else if (result == Level::load_fail_bad_format)
 		cerr << "Your level was improperly formatted" << endl;
 	else if (result == Level::load_success)
@@ -106,6 +106,11 @@ int StudentWorld::move()
 		}
 		else it++;
 	}
+	ostringstream oss;
+	oss << "Score: " << getScore() << "  Level: " << getLevel() << "  Lives: " << getLives() << "  Vaccines: " << m_player->getNumVaccines() <<
+		"  Flames: " << m_player->getNumFlameCharges() << "  Mines: " << m_player->getNumLandmines() << "  Infected: " << m_player->getInfectionCount();
+	string currentstats = oss.str();
+	setGameStatText(currentstats);
     // This code is here merely to allow the game to build, run, and terminate after you hit enter.
     // Notice that the return value GWSTATUS_PLAYER_DIED will cause our framework to end the current level.
     //decLives();
@@ -225,13 +230,13 @@ bool StudentWorld::determineOverlapwithCitizen(double x, double y)
 	vector<Actor*>::iterator it;
 	for (it = gameObjects.begin(); it != gameObjects.end(); it++)
 	{
-		if ((*it)->defineObjectType() == "CITIZEN")
+		if ((*it)->canbeInfected())
 		{
 			double dist_x = (*it)->getX() - x;
 			double dist_y = (*it)->getY() - y;
 			if (dist_x*dist_x + dist_y * dist_y <= 100)
 			{
-				(*it)->setStatus(false);
+				(*it)->changeStatus();
 				num_alivecitizens--;
 				return true;
 			}
@@ -251,7 +256,7 @@ bool StudentWorld::determineOverlapwithCitizen(double x, double y)
 //			double dist_y = (*it)->getY() - y;
 //			if (dist_x*dist_x + dist_y * dist_y <= 100)
 //			{
-//				(*it)->setStatus(false);
+//				(*it)->changeStatus();
 //				return true;
 //			}
 //		}
@@ -261,7 +266,7 @@ bool StudentWorld::determineOverlapwithCitizen(double x, double y)
 
 void StudentWorld::setPenelopetoDead()
 {
-	m_player->setStatus(false);
+	m_player->changeStatus();
 	playSound(SOUND_PLAYER_DIE);
 }
 
@@ -276,7 +281,7 @@ void StudentWorld::setPenelopetoDead()
 //			double dist_y = (*it)->getY() - y;
 //			if (dist_x*dist_x + dist_y * dist_y <= 100)
 //			{
-//				(*it)->setStatus(false);
+//				(*it)->changeStatus();
 //				return;
 //			}
 //		}
@@ -296,17 +301,7 @@ void StudentWorld::getKilledbyFlameorPit(double x, double y)
 			double dist_y = (*it)->getY() - y;
 			if (dist_x*dist_x + dist_y * dist_y <= 100)
 			{
-				(*it)->setStatus(false);
-				if ((*it)->defineObjectType() == "CITIZEN")
-				{
-					increaseScore(-1000);
-					cerr << "killed citizen";
-				}
-				else if ((*it)->defineObjectType() == "SMARTZOMBIE")
-					increaseScore(2000);
-				else if ((*it)->defineObjectType() == "DUMBZOMBIE")
-					increaseScore(1000);
-
+				(*it)->changeStatus();
 			}
 		}
 	}
@@ -327,7 +322,7 @@ void StudentWorld::infecteverything(double x, double y)
 			double dist_y = (*it)->getY() - y;
 			if (dist_x*dist_x + dist_y * dist_y <= 100)
 			{
-				(*it)->setInfectedStatus(true);
+				static_cast<Person*>(*it)->setInfectedStatus(true);
 			}
 		}
 	}
@@ -397,6 +392,22 @@ bool StudentWorld::isLandmineTriggered(double x, double y)
 			{
 				return true;
 			}
+		}
+	}
+	return false;
+}
+
+bool StudentWorld::isZombieVomitTriggerAt(double x, double y)
+{
+	if (determineOverlapwithPlayer(x, y)) return true;
+	for (int i = 0; i != gameObjects.size(); i++)
+	{
+		if (gameObjects[i]->canbeInfected())
+		{
+			double dist_x = gameObjects[i]->getX() - x;
+			double dist_y = gameObjects[i]->getY() - y;
+			if (dist_x*dist_x + dist_y * dist_y <= 100)
+				return true;
 		}
 	}
 	return false;
