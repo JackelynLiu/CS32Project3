@@ -27,10 +27,10 @@ int StudentWorld::init()
 {
 	num_alivecitizens = 0;
 	Level lev(assetPath());
-	string levelFile = "level01.txt";
+	string levelFile = "level04.txt";
 	Level::LoadResult result = lev.loadLevel(levelFile);
 	if (result == Level::load_fail_file_not_found)
-		cerr << "Cannot find level01.txt data file" << endl;
+		cerr << "Cannot find level04.txt data file" << endl;
 	else if (result == Level::load_fail_bad_format)
 		cerr << "Your level was improperly formatted" << endl;
 	else if (result == Level::load_success)
@@ -259,48 +259,12 @@ bool StudentWorld::determineOverlapwithCitizen(double x, double y)
 	return false;
 }
 
-//bool StudentWorld::determineOverlapwithZombie(double x, double y)
-//{
-//	vector<Actor*>::iterator it;
-//	for (it = gameObjects.begin(); it != gameObjects.end(); it++)
-//	{
-//		if ((*it)->defineObjectType() == "ZOMBIE")
-//		{
-//			double dist_x = (*it)->getX() - x;
-//			double dist_y = (*it)->getY() - y;
-//			if (dist_x*dist_x + dist_y * dist_y <= 100)
-//			{
-//				(*it)->changeStatus();
-//				return true;
-//			}
-//		}
-//	}
-//	return false;
-//}
 
 void StudentWorld::setPenelopetoDead()
 {
 	m_player->changeStatus();
 	playSound(SOUND_PLAYER_DIE);
 }
-
-//void StudentWorld::setOverlappedZombietoDead(double x, double y)
-//{
-//	vector<Actor*>::iterator it;
-//	for (it = gameObjects.begin(); it != gameObjects.end(); it++)
-//	{
-//		if ((*it)->defineObjectType() == "ZOMBIE")
-//		{
-//			double dist_x = (*it)->getX() - x;
-//			double dist_y = (*it)->getY() - y;
-//			if (dist_x*dist_x + dist_y * dist_y <= 100)
-//			{
-//				(*it)->changeStatus();
-//				return;
-//			}
-//		}
-//	}
-//}
 
 int StudentWorld::getNumCitizensLeft() const { return num_alivecitizens; }
 
@@ -373,14 +337,14 @@ double StudentWorld::distanceFromNearestZombie(double x, double y)
 double StudentWorld::getPenelopexcoord() const { return m_player->getX(); }
 double StudentWorld::getPenelopeycoord() const { return m_player->getY(); }
 
-int StudentWorld::whattofollow(double x, double y)
-{
-	double dist_p = distanceFromPenelope(x, y);
-	double dist_z = distanceFromNearestZombie(x, y);
-	if (dist_p <= dist_z && dist_p <= 80)
-		return 1;
-	else return 2;
-}
+//int StudentWorld::whattofollow(double x, double y)
+//{
+//	double dist_p = distanceFromPenelope(x, y);
+//	double dist_z = distanceFromNearestZombie(x, y);
+//	if (dist_p <= dist_z && dist_p <= 80)
+//		return 1;
+//	else return 2;
+//}
 
 void StudentWorld::pickupGoodies(double x, double y)
 {
@@ -425,4 +389,35 @@ bool StudentWorld::isZombieVomitTriggerAt(double x, double y)
 		}
 	}
 	return false;
+}
+
+bool StudentWorld::locateNearestVomitTrigger(double x, double y, double& otherX, double& otherY, double& distance)
+{
+	double dist_p = distanceFromPenelope(x, y);
+	double dist_h = 400000000;
+	for (int i = 0; i < gameObjects.size(); i++)
+	{
+		if (gameObjects[i]->canbeInfected())
+		{
+			double dist_x = gameObjects[i]->getX() - x;
+			double dist_y = gameObjects[i]->getY() - y;
+			double temp_dist = sqrt((dist_x*dist_x) + (dist_y * dist_y));
+			if (temp_dist < dist_h)
+			{
+				dist_h = temp_dist;
+				otherX = gameObjects[i]->getX();
+				otherY = gameObjects[i]->getY();
+			}
+		}
+	}
+	if (dist_p < dist_h)
+	{
+		distance = dist_p;
+		otherX = m_player->getX();
+		otherY = m_player->getY();
+	}
+	else distance = dist_h;
+
+	if (distance <= 80) return true;
+	else return false;
 }
