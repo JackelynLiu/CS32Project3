@@ -9,6 +9,8 @@ Actor::Actor(StudentWorld* sw, int imageID, double x, double y, int dir, int dep
 	:GraphObject(imageID, x, y, dir, depth), current_world(sw), m_status(true), m_tickcount(0)
 {}
 
+bool Actor::blocksMovement() const { return false; }
+
 bool Actor::getStatus() const { return m_status; }
 
 void Actor::changeStatus() { m_status = false; }
@@ -27,12 +29,11 @@ void Actor::useExitIfAppropriate() {};
 
 bool Actor::canbePickedUp() const { return false; }
 
-bool Actor::triggersCitizens() const { return false; }
-
 bool Actor::threatensCitizens() const { return false; }
+
 void Actor::pickup(Penelope* p) {}
 
-bool Actor::isAt(double x, double y)
+bool Actor::isAt(double x, double y) const
 {
 	if (getX() == x && getY() == y)
 		return true;
@@ -74,8 +75,6 @@ void Person::setInfectedStatus(bool infected) { m_infectedstatus = infected; }
 Penelope::Penelope(StudentWorld* sw, double x, double y)
 	:Person(sw, IID_PLAYER, x, y), num_vaccines(0), num_landmines(0), num_flamecharges(0)
 {}
-
-bool Penelope::triggersCitizens() const { return true; }
 
 void Penelope::changeStatus()
 {
@@ -430,7 +429,6 @@ void Zombie::changeStatus()
 	getWorld()->playSound(SOUND_ZOMBIE_DIE);
 }
 
-bool Zombie::triggersCitizens() const { return true; }
 bool Zombie::threatensCitizens() const { return true; }
 
 void Zombie::doSomething()
@@ -709,8 +707,6 @@ bool Wall::blocksFlame() const { return true; }
 StillObjects::StillObjects(StudentWorld* sw, int imageID, double x, double y, int dir, int depth)
 	:Actor(sw, imageID, x, y, dir, depth)
 {}
-
-bool StillObjects::blocksMovement() const { return false; }
 
 Exit::Exit(StudentWorld* sw, double x, double y)
 	:StillObjects(sw, IID_EXIT, x, y, right, 1)
