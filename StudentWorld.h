@@ -46,6 +46,8 @@ public:
 
 	void completedLevel();
 
+	bool overlapsWithAnything(double x, double y);
+
 private:
 	std::vector<Actor*> gameObjects;
 	Penelope* m_player;
