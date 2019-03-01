@@ -325,7 +325,8 @@ void StudentWorld::infecteverything(double x, double y)
 			if (dist_x*dist_x + dist_y * dist_y <= 100)
 			{
 				static_cast<Person*>(*it)->setInfectedStatus(true);
-				playSound(SOUND_CITIZEN_INFECTED);
+				if (!static_cast<Person*>(*it)->getInfectedStatus())
+					playSound(SOUND_CITIZEN_INFECTED);
 			}
 		}
 	}
