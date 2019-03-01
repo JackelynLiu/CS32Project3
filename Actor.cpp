@@ -77,6 +77,13 @@ Penelope::Penelope(StudentWorld* sw, double x, double y)
 
 bool Penelope::triggersCitizens() const { return true; }
 
+void Penelope::changeStatus()
+{
+	Actor::changeStatus();
+	getWorld()->decLives();
+	getWorld()->playSound(SOUND_PLAYER_DIE);
+}
+
 void Penelope::doSomething()
 {
 	if (!getStatus())
@@ -85,7 +92,6 @@ void Penelope::doSomething()
 	if (getInfectionCount() == 500)
 	{
 		changeStatus();
-		getWorld()->playSound(SOUND_PLAYER_DIE);
 		return;
 	}
 	int ch;
