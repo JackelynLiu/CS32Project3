@@ -78,7 +78,7 @@ class Penelope : public Person
 public:
 	Penelope(StudentWorld* sw, double x, double y);
 	virtual void doSomething();
-	virtual void useExitIfAppropriate();
+	//virtual void useExitIfAppropriate();
 	virtual bool triggersCitizens() const;
 	/*virtual void dieByFallOrBurnIfAppropriate();
 	virtual void pickUpGoodieIfAppropriate(Goodie* g);*/
@@ -102,6 +102,7 @@ public:
 	Citizen(StudentWorld* sw, double x, double y);
 	virtual void doSomething();
 	virtual void changeStatus();
+	virtual void useExitIfAppropriate();
 
 };
 
