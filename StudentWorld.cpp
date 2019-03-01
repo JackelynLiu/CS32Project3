@@ -39,10 +39,16 @@ int StudentWorld::init()
 	Level lev(assetPath());
 	string levelFile = levelstring.str();
 	Level::LoadResult result = lev.loadLevel(levelFile);
-	if (result == Level::load_fail_file_not_found)
+	if (result == Level::load_fail_file_not_found || getLevel() == 100)
+	{
 		cerr << "Cannot find " << levelFile << " data file" << endl;
+		return GWSTATUS_PLAYER_WON;
+	}
 	else if (result == Level::load_fail_bad_format)
+	{
 		cerr << "Your level was improperly formatted" << endl;
+		return GWSTATUS_LEVEL_ERROR;
+	}
 	else if (result == Level::load_success)
 	{
 		cerr << "Successfully loaded level" << endl;
@@ -320,6 +326,7 @@ void StudentWorld::infecteverything(double x, double y)
 			if (dist_x*dist_x + dist_y * dist_y <= 100)
 			{
 				static_cast<Person*>(*it)->setInfectedStatus(true);
+				playSound(SOUND_CITIZEN_INFECTED);
 			}
 		}
 	}
@@ -496,4 +503,17 @@ void StudentWorld::completedLevel()
 {
 	level_completed = true;
 	playSound(SOUND_LEVEL_FINISHED);
+}
+
+bool StudentWorld::overlapsWithAnything(double x, double y)
+{
+	vector<Actor*>::iterator it;
+	for (it = gameObjects.begin(); it != gameObjects.end(); it++)
+	{
+		double dist_x = (*it)->getX() - x;
+		double dist_y = (*it)->getY() - y;
+		if (dist_x*dist_x + dist_y * dist_y <= 100)
+			return true;
+	}
+	return false;
 }
