@@ -25,13 +25,12 @@ bool Actor::blocksFlame() const { return false; }
 
 void Actor::useExitIfAppropriate() {};
 
-void Actor::activateifAppropriate(Actor* a) {}
-
 bool Actor::canbePickedUp() const { return false; }
 
 bool Actor::triggersCitizens() const { return false; }
 
 bool Actor::threatensCitizens() const { return false; }
+void Actor::pickup(Penelope* p) {}
 
 bool Actor::isAt(double x, double y)
 {
@@ -75,14 +74,6 @@ void Person::setInfectedStatus(bool infected) { m_infectedstatus = infected; }
 Penelope::Penelope(StudentWorld* sw, double x, double y)
 	:Person(sw, IID_PLAYER, x, y), num_vaccines(0), num_landmines(0), num_flamecharges(0)
 {}
-
-//void Penelope::useExitIfAppropriate()
-//{
-//	if (getWorld()->getNumCitizensLeft() == 0)
-//	{
-//		//getWorld()->completedLevel();
-//	}
-//}
 
 bool Penelope::triggersCitizens() const { return true; }
 
@@ -643,12 +634,50 @@ void SmartZombie::doSomething()
 
 DumbZombie::DumbZombie(StudentWorld* sw, double x, double y)
 	:Zombie(sw, x, y)
-{}
+{
+	int r = randInt(1, 10);
+	if (r == 1)
+	{
+		has_vaccine = true;
+	}
+	else has_vaccine = false;
+
+}
 
 void DumbZombie::changeStatus()
 {
-	Zombie::changeStatus();
 	getWorld()->increaseScore(1000);
+	if (has_vaccine)
+	{
+		double dest_x = getX();
+		double dest_y = getY();
+		setRandomDirection();
+		switch (getDirection())
+		{
+		case right:
+			dest_x += SPRITE_WIDTH;
+			break;
+		case left:
+			dest_x -= SPRITE_WIDTH;
+			break;
+		case up:
+			dest_y += SPRITE_HEIGHT;
+			break;
+		case down:
+			dest_y -= SPRITE_HEIGHT;
+			break;
+		default:
+			break;
+		}
+
+		if (!getWorld()->overlapsWithAnything(dest_x, dest_y))
+		{
+			VaccineGoodie* new_vacc = new VaccineGoodie(getWorld(),dest_x, dest_y);
+			getWorld()->addintovector(new_vacc);
+		}
+
+	}
+	Zombie::changeStatus();
 }
 
 void DumbZombie::doSomething()	//carrying vaccine -- remember to implement
@@ -686,7 +715,7 @@ void Exit::doSomething()
 	getWorld()->determineOverlapwithCitizen(getX(), getY());
 	if (getWorld()->determineOverlapwithPlayer(getX(), getY()))
 	{
-		if (getWorld()->getNumCitizensLeft() == 0)
+		if (getWorld()->getNumCitizensLeft() <= 0)
 			getWorld()->completedLevel();
 	}
 }
