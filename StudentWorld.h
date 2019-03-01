@@ -35,9 +35,6 @@ public:
 	bool locateNearestVomitTrigger(double x, double y, double& otherX, double& otherY, double& distance);
 	bool locateNearestCitizenTrigger(double x, double y, double& otherX, double& otherY, double& distance, bool& isThreat) const;
 	bool locateNearestCitizenThreat(double x, double y, double& otherX, double& otherY, double& distance) const;
-	double getPenelopexcoord() const; //stop using
-	double getPenelopeycoord() const; //stop using
-	//int whattofollow(double x, double y);
 	//Direction whichdirectionshouldCitizengo(double x, double y);
 	bool isLandmineTriggered(double x, double y);
 
@@ -46,13 +43,14 @@ public:
 	bool isZombieVomitTriggerAt(double x, double y);
 
 	void recordCitizenGone();
-	//void recordLevelFinishedIfAllCitizensGone();
-	//bool isMovingObjectBlockedAt(double x, double y) const;
+
+	void completedLevel();
 
 private:
 	std::vector<Actor*> gameObjects;
 	Penelope* m_player;
 	int num_alivecitizens;
+	bool level_completed;
 };
 
 #endif // STUDENTWORLD_H_
