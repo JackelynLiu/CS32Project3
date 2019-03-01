@@ -23,7 +23,7 @@ bool Actor::canbeInfected() const { return false; }
 
 bool Actor::blocksFlame() const { return false; }
 
-void Actor::useExitIfAppropriate() {}
+void Actor::useExitIfAppropriate() {};
 
 void Actor::activateifAppropriate(Actor* a) {}
 
@@ -76,13 +76,13 @@ Penelope::Penelope(StudentWorld* sw, double x, double y)
 	:Person(sw, IID_PLAYER, x, y), num_vaccines(0), num_landmines(0), num_flamecharges(0)
 {}
 
-void Penelope::useExitIfAppropriate()
-{
-	if (getWorld()->getNumCitizensLeft() == 0)
-	{
-		//getWorld()->completedLevel();
-	}
-}
+//void Penelope::useExitIfAppropriate()
+//{
+//	if (getWorld()->getNumCitizensLeft() == 0)
+//	{
+//		//getWorld()->completedLevel();
+//	}
+//}
 
 bool Penelope::triggersCitizens() const { return true; }
 
@@ -195,7 +195,10 @@ void Penelope::doSomething()
 				break;
 			else num_vaccines--;
 			if (getInfectedStatus())
+			{
 				setInfectedStatus(false);
+				setInfectionCount(0);
+			}
 			break;
 		}
 		default:
@@ -232,6 +235,8 @@ Citizen::Citizen(StudentWorld* sw, double x, double y)
 void Citizen::changeStatus() 
 {
 	Actor::changeStatus();
+	getWorld()->playSound(SOUND_CITIZEN_DIE);
+	getWorld()->recordCitizenGone();
 	getWorld()->increaseScore(-1000);
 }
 
@@ -254,7 +259,6 @@ void Citizen::doSomething()
 			new_Zombie = new DumbZombie(getWorld(), current_x, current_y);
 		else new_Zombie = new SmartZombie(getWorld(), current_x, current_y);
 		getWorld()->addintovector(new_Zombie);
-		getWorld()->recordCitizenGone();
 		return;
 	}
 	if (gettickcount() % 2 == 0)
@@ -269,7 +273,7 @@ void Citizen::doSomething()
 			map<double, Direction> dist2dir;
 			double distR, distL, distU, distD;
 			double dist_max = trigger_dist;
-			Direction dir_max = right;
+			Direction dir_max = getDirection();
 
 			if (!getWorld()->containsObstacle(current_x, current_y, current_x + 2, current_y))
 			{
@@ -295,12 +299,11 @@ void Citizen::doSomething()
 			//map is in ascending order so last one is max
 			map<double, Direction>::iterator it;
 			it = dist2dir.end();
-			if (dist2dir.size() > 0)
-				it--;			//i cant decrement it???
-
-			dist_max = it->first;
+			if (dist2dir.empty()) return;
+			it--;			//i cant decrement it??? pls fix
+			dist_max = (*it).first;
 			if (dist_max >= trigger_dist)
-				dir_max = it->second;
+				dir_max = (*it).second;
 			else return;
 
 			setDirection(dir_max);
@@ -410,6 +413,14 @@ void Citizen::doSomething()
 		}
 	}
 	else return;
+}
+
+void Citizen::useExitIfAppropriate()
+{
+	Actor::changeStatus();
+	getWorld()->playSound(SOUND_CITIZEN_SAVED);
+	getWorld()->recordCitizenGone();
+	getWorld()->increaseScore(500);
 }
 
 Zombie::Zombie(StudentWorld* sw, double x, double y)
@@ -672,15 +683,11 @@ Exit::Exit(StudentWorld* sw, double x, double y)
 
 void Exit::doSomething()
 {
-	if (getWorld()->determineOverlapwithCitizen(getX(), getY()))
-	{
-		getWorld()->increaseScore(500);
-		getWorld()->playSound(SOUND_CITIZEN_SAVED);
-	}
+	getWorld()->determineOverlapwithCitizen(getX(), getY());
 	if (getWorld()->determineOverlapwithPlayer(getX(), getY()))
 	{
 		if (getWorld()->getNumCitizensLeft() == 0)
-			getWorld()->advanceToNextLevel();
+			getWorld()->completedLevel();
 	}
 }
 
@@ -783,15 +790,15 @@ void Landmine::explode()
 {
 	changeStatus();
 	getWorld()->playSound(SOUND_LANDMINE_EXPLODE);
-	getWorld()->addintovector(new Flame(getWorld(), getX(), getY(), right));
-	getWorld()->addintovector(new Flame(getWorld(), getX() - SPRITE_WIDTH, getY(), right));
-	getWorld()->addintovector(new Flame(getWorld(), getX() + SPRITE_WIDTH, getY(), right));
-	getWorld()->addintovector(new Flame(getWorld(), getX(), getY() - SPRITE_HEIGHT, right));
+	getWorld()->addintovector(new Flame(getWorld(), getX(), getY(), up));
+	getWorld()->addintovector(new Flame(getWorld(), getX() - SPRITE_WIDTH, getY(), up));
+	getWorld()->addintovector(new Flame(getWorld(), getX() + SPRITE_WIDTH, getY(), up));
+	getWorld()->addintovector(new Flame(getWorld(), getX(), getY() - SPRITE_HEIGHT, up));
 	getWorld()->addintovector(new Flame(getWorld(), getX(), getY() + SPRITE_HEIGHT, right));
-	getWorld()->addintovector(new Flame(getWorld(), getX() - SPRITE_WIDTH, getY() + SPRITE_HEIGHT, right));
-	getWorld()->addintovector(new Flame(getWorld(), getX() + SPRITE_WIDTH, getY() + SPRITE_HEIGHT, right));
-	getWorld()->addintovector(new Flame(getWorld(), getX() - SPRITE_WIDTH, getY() - SPRITE_HEIGHT, right));
-	getWorld()->addintovector(new Flame(getWorld(), getX() + SPRITE_WIDTH, getY() - SPRITE_HEIGHT, right));
+	getWorld()->addintovector(new Flame(getWorld(), getX() - SPRITE_WIDTH, getY() + SPRITE_HEIGHT, up));
+	getWorld()->addintovector(new Flame(getWorld(), getX() + SPRITE_WIDTH, getY() + SPRITE_HEIGHT, up));
+	getWorld()->addintovector(new Flame(getWorld(), getX() - SPRITE_WIDTH, getY() - SPRITE_HEIGHT, up));
+	getWorld()->addintovector(new Flame(getWorld(), getX() + SPRITE_WIDTH, getY() - SPRITE_HEIGHT, up));
 	getWorld()->addintovector(new Pit(getWorld(), getX(), getY()));
 }
 
