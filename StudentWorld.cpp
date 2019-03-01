@@ -26,11 +26,21 @@ StudentWorld::~StudentWorld() { cleanUp(); }
 int StudentWorld::init()
 {
 	num_alivecitizens = 0;
+	level_completed = false;
+
+	ostringstream levelstring;
+
+	levelstring << "level";
+	int n = getLevel();
+	levelstring.fill('0');
+	levelstring << setw(2) << n;
+	levelstring << ".txt";
+
 	Level lev(assetPath());
-	string levelFile = "level01.txt";
+	string levelFile = levelstring.str();
 	Level::LoadResult result = lev.loadLevel(levelFile);
 	if (result == Level::load_fail_file_not_found)
-		cerr << "Cannot find level01.txt data file" << endl;
+		cerr << "Cannot find " << levelFile << " data file" << endl;
 	else if (result == Level::load_fail_bad_format)
 		cerr << "Your level was improperly formatted" << endl;
 	else if (result == Level::load_success)
@@ -107,6 +117,16 @@ int StudentWorld::move()
 		}
 		else it++;
 	}
+
+	if (!m_player->getStatus())
+	{
+		decLives();
+		return GWSTATUS_PLAYER_DIED;
+	}
+
+	if (level_completed)
+		return GWSTATUS_FINISHED_LEVEL;
+
 	ostringstream oss;
 	oss << "Score: ";
 	if (getScore() >= 0)
@@ -250,8 +270,7 @@ bool StudentWorld::determineOverlapwithCitizen(double x, double y)
 			double dist_y = (*it)->getY() - y;
 			if (dist_x*dist_x + dist_y * dist_y <= 100)
 			{
-				(*it)->changeStatus();
-				num_alivecitizens--;
+				(*it)->useExitIfAppropriate();
 				return true;
 			}
 		}
@@ -333,18 +352,6 @@ double StudentWorld::distanceFromNearestZombie(double x, double y)
 	}
 	return min;
 }
-
-double StudentWorld::getPenelopexcoord() const { return m_player->getX(); }
-double StudentWorld::getPenelopeycoord() const { return m_player->getY(); }
-
-//int StudentWorld::whattofollow(double x, double y)
-//{
-//	double dist_p = distanceFromPenelope(x, y);
-//	double dist_z = distanceFromNearestZombie(x, y);
-//	if (dist_p <= dist_z && dist_p <= 80)
-//		return 1;
-//	else return 2;
-//}
 
 void StudentWorld::pickupGoodies(double x, double y)
 {
@@ -483,4 +490,10 @@ bool StudentWorld::locateNearestCitizenThreat(double x, double y, double& otherX
 void StudentWorld::recordCitizenGone()
 {
 	num_alivecitizens--;
+}
+
+void StudentWorld::completedLevel()
+{
+	level_completed = true;
+	playSound(SOUND_LEVEL_FINISHED);
 }
