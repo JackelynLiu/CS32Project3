@@ -24,9 +24,7 @@ public:
 	int gettickcount() const;
 	void increasetickcount();
 
-	virtual void pickup(Penelope* p) {}
-
-	virtual void activateifAppropriate(Actor* a);
+	virtual void pickup(Penelope* p);
 
 	//try to replace
 	virtual bool canbePickedUp() const;
@@ -137,6 +135,9 @@ public:
 	DumbZombie(StudentWorld* sw, double x, double y);
 	virtual void doSomething();
 	virtual void changeStatus();
+
+private:
+	bool has_vaccine;
 };
 
 class Wall :public Actor
