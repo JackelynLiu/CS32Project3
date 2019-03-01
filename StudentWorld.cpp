@@ -288,7 +288,6 @@ bool StudentWorld::determineOverlapwithCitizen(double x, double y)
 void StudentWorld::setPenelopetoDead()
 {
 	m_player->changeStatus();
-	playSound(SOUND_PLAYER_DIE);
 }
 
 int StudentWorld::getNumCitizensLeft() const { return num_alivecitizens; }
