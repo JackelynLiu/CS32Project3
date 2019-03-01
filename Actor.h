@@ -11,31 +11,30 @@ public:
 	Actor(StudentWorld* sw, int imageID, double x, double y, int dir, int depth);
 	//virtual ~Actor();
 	virtual void doSomething() = 0;
-	virtual bool blocksMovement() const = 0;
+	virtual bool blocksMovement() const;
 	virtual bool canbeDamaged() const;
 	virtual bool canbeInfected() const;		//PENELOPE, CITIZEN
 	virtual bool blocksFlame() const;		//WALL, EXIT
-	virtual bool triggersCitizens() const;
 	virtual bool threatensCitizens() const;
 
 	
 	bool getStatus() const;
 	virtual void changeStatus();
-	int gettickcount() const;
-	void increasetickcount();
 
 	virtual void pickup(Penelope* p);
 
 	//try to replace
 	virtual bool canbePickedUp() const;
 	
-	bool isAt(double x, double y);
+	bool isAt(double x, double y) const;
 
 	//make more general function
 	virtual bool canactivateLandmine() const;
 	virtual void useExitIfAppropriate();
 
-
+protected:
+	int gettickcount() const;
+	void increasetickcount();
 	StudentWorld* getWorld() { return current_world; }
 
 private:
@@ -78,7 +77,6 @@ public:
 	virtual void doSomething();
 	virtual void changeStatus();
 	//virtual void useExitIfAppropriate();
-	virtual bool triggersCitizens() const;
 	/*virtual void dieByFallOrBurnIfAppropriate();
 	virtual void pickUpGoodieIfAppropriate(Goodie* g);*/
 
@@ -111,7 +109,6 @@ public:
 	Zombie(StudentWorld* sw, double x, double y);
 	virtual void doSomething();
 	virtual void changeStatus();
-	virtual bool triggersCitizens() const;
 	virtual bool threatensCitizens() const;
 
 protected:
@@ -155,7 +152,6 @@ class StillObjects :public Actor
 public:
 	StillObjects(StudentWorld* sw, int imageID, double x, double y, int dir, int depth);
 	virtual void doSomething() = 0;
-	virtual bool blocksMovement() const;
 };
 
 class Exit :public StillObjects
